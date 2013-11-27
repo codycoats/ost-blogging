@@ -6,7 +6,7 @@
   <h1>{{user}}</h1>
   {%if blog is undefined%}
     <h2>You haven't started any blogs</h2>
-    <a href="">Create One</a>
+    <a href="/new-blog">Create One</a>
   {%else %}
     {% for blog in blogs %}
         <h2>{{blog.title}}</h2>

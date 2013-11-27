@@ -24,6 +24,9 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     extensions=['jinja2.ext.autoescape'],
     autoescape=True)
 
+DEFAULT_BLOG_NAME = 'default_blog'
+
+
 class MainHandler(webapp2.RequestHandler):
 
   def get(self):
@@ -58,7 +61,37 @@ class UserHome(webapp2.RequestHandler):
     }
 
     template = JINJA_ENVIRONMENT.get_template('home.html')
-    self.response.write(template.render(template_values));
+    self.response.write(template.render(template_values))
+
+def blog_key(blog_name=DEFAULT_BLOG_NAME):
+    """Constructs a Datastore key for a Blog entity with blog_name."""
+    return ndb.Key('Blog', blog_name)
+
+class NewBlog(webapp2.RequestHandler):
+  def get(self):
+    template = JINJA_ENVIRONMENT.get_template('new-blog.html')
+    self.response.write(template.render())
+
+class CreateBlog(webapp2.RequestHandler):
+  def post(self):
+    #create new Blog Model
+    blog_name = self.request.get('blog_name',
+                                          DEFAULT_BLOG_NAME)
+    blog = Blog(parent=blog_key(blog_name))
+
+    if users.get_current_user():
+        blog.owner = users.get_current_user()
+
+    blog.title = self.request.get('title')
+
+    #store in DB
+    blog.put()
+
+    #redirect back to homepage
+    self.redirect('/home')
+
+
+
 
 
 #Models
@@ -72,9 +105,9 @@ class Blog(ndb.Model):
   title = ndb.StringProperty()
   posts = ndb.StructuredProperty(Post, repeated=True)
 
-
-
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
-    ('/home', UserHome)
+    ('/home', UserHome),
+    ('/new-blog', NewBlog),
+    ('/create-blog', CreateBlog),
 ], debug=True)
