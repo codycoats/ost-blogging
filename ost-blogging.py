@@ -17,7 +17,7 @@
 from google.appengine.api import users
 from google.appengine.ext import ndb
 
-import cgi, webapp2, jinja2
+import os, cgi, webapp2, jinja2
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -27,13 +27,16 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 class MainHandler(webapp2.RequestHandler):
 
   def get(self):
-      user = users.get_current_user()
+    #render splash page
+    template_values = {
+      'blog_title': "Splash",
+    }
 
-      if user:
-          self.response.headers['Content-Type'] = 'text/plain'
-          self.response.write('Hello, ' + user.nickname())
-      else:
-          self.redirect(users.create_login_url(self.request.uri))
+    template = JINJA_ENVIRONMENT.get_template('index.html')
+    self.response.write(template.render(template_values));
+
+#Models
+#
 
 class Post(ndb.Model):
   author = ndb.UserProperty()
@@ -42,7 +45,7 @@ class Post(ndb.Model):
 
 class Blog(ndb.Model):
   owner = ndb.UserProperty()
-  posts = ndb.StructureProperty(Post, repeated=True)
+  posts = ndb.StructuredProperty(Post, repeated=True)
 
 
 app = webapp2.WSGIApplication([
