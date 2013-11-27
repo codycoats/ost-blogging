@@ -45,23 +45,33 @@ class MainHandler(webapp2.RequestHandler):
       self.response.write(template.render(template_values));
 
 class UserHome(webapp2.RequestHandler):
-
   def get(self):
-    #get user's list of blogs
-    user = users.get_current_user()
-    logging.debug("current user: %s", str(user))
-    user_blogs_query = Blog.query(Blog.owner == user)
-    user_blogs = user_blogs_query.fetch()
+    if users.get_current_user():
+      user = users.get_current_user()
 
-    logging.debug("%s's blogs: %s", user, user_blogs)
+      logging.debug("current user: %s", str(user))
+      user_blogs_query = Blog.query(Blog.owner == user)
+      user_blogs = user_blogs_query.fetch()
 
-    template_values = {
-      'user'  : user,
-      'blogs' : user_blogs
-    }
+      logging.debug("%s's blogs: %s", user, user_blogs)
 
-    template = JINJA_ENVIRONMENT.get_template('home.html')
-    self.response.write(template.render(template_values))
+      url = users.create_logout_url(self.request.uri)
+      url_linktext = 'Logout'
+
+      logging.debug(url, url_linktext)
+
+      template_values = {
+        'user'    : user,
+        'blogs'   : user_blogs,
+        'url'     : url,
+        'url_linktext': url_linktext
+      }
+
+      template = JINJA_ENVIRONMENT.get_template('home.html')
+      self.response.write(template.render(template_values))
+
+    else:
+      self.redirect('/')
 
 def blog_key(blog_name=DEFAULT_BLOG_NAME):
     """Constructs a Datastore key for a Blog entity with blog_name."""

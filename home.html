@@ -3,11 +3,15 @@
   <title>{{user}}</title>
 </head>
 <body>
-  <h1>{{user}}</h1>
+  <nav>
+  <h1>OST-Blogging</h1>
+  <a href="{{ url|safe }}">{{ url_linktext }}</a>
+  </nav>
+  <h2>{{user}}</h2>
   {% for blog in blogs %}
-      <h2>{{blog.title}}</h2>
+      <h3>{{blog.title}}</h3>
   {% else %}
-    <h2>Doesn't look like you've made a blog yet</h2>
+    <h3>Doesn't look like you've made a blog yet</h3>
   {% endfor %}
   <a href="/new-blog">Create New Blog</a>
 </body>
