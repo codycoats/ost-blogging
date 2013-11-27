@@ -50,14 +50,14 @@ class UserHome(webapp2.RequestHandler):
     #get user's list of blogs
     user = users.get_current_user()
     logging.debug("current user: %s", str(user))
-    user_blogs = Blog.query(Blog.owner == user)
-    logging.debug("%s's blogs: %s", str(user), str(user_blogs))
+    user_blogs_query = Blog.query(Blog.owner == user)
+    user_blogs = user_blogs_query.fetch()
 
-    logging.debug(type(user_blogs))
+    logging.debug("%s's blogs: %s", user, user_blogs)
 
     template_values = {
       'user'  : user,
-      'blogs' : user_blogs
+      'blog' : user_blogs
     }
 
     template = JINJA_ENVIRONMENT.get_template('home.html')
