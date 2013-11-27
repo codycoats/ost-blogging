@@ -17,19 +17,23 @@
 from google.appengine.api import users
 from google.appengine.ext import ndb
 
-import cgi, webapp2
+import cgi, webapp2, jinja2
+
+JINJA_ENVIRONMENT = jinja2.Environment(
+    loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
+    extensions=['jinja2.ext.autoescape'],
+    autoescape=True)
 
 class MainHandler(webapp2.RequestHandler):
 
-    def get(self):
-        user = users.get_current_user()
+  def get(self):
+      user = users.get_current_user()
 
-        if user:
-            self.response.headers['Content-Type'] = 'text/plain'
-            self.response.write('Hello, ' + user.nickname())
-        else:
-            self.redirect(users.create_login_url(self.request.uri))
-
+      if user:
+          self.response.headers['Content-Type'] = 'text/plain'
+          self.response.write('Hello, ' + user.nickname())
+      else:
+          self.redirect(users.create_login_url(self.request.uri))
 
 class Post(ndb.Model):
   author = ndb.UserProperty()
