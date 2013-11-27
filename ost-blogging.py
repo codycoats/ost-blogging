@@ -15,8 +15,9 @@
 # limitations under the License.
 #
 from google.appengine.api import users
+from google.appengine.ext import ndb
 
-import webapp2
+import cgi, webapp2
 
 class MainHandler(webapp2.RequestHandler):
 
@@ -28,6 +29,12 @@ class MainHandler(webapp2.RequestHandler):
             self.response.write('Hello, ' + user.nickname())
         else:
             self.redirect(users.create_login_url(self.request.uri))
+
+
+class Post(ndb.Model):
+  author = ndb.UserProperty()
+  content = ndb.TextProperty()
+  date = ndb.DateTimeProperty(auto_now_add=True)
 
 
 app = webapp2.WSGIApplication([
