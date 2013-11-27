@@ -36,6 +36,10 @@ class Post(ndb.Model):
   content = ndb.TextProperty()
   date = ndb.DateTimeProperty(auto_now_add=True)
 
+class Blog(ndb.Model):
+  owner = ndb.UserProperty()
+  posts = ndb.StructureProperty(Post, repeated=True)
+
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler)
