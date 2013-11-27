@@ -57,7 +57,7 @@ class UserHome(webapp2.RequestHandler):
 
     template_values = {
       'user'  : user,
-      'blog' : user_blogs
+      'blogs' : user_blogs
     }
 
     template = JINJA_ENVIRONMENT.get_template('home.html')

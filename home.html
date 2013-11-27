@@ -4,13 +4,11 @@
 </head>
 <body>
   <h1>{{user}}</h1>
-  {%if blog is undefined%}
-    <h2>You haven't started any blogs</h2>
-    <a href="/new-blog">Create One</a>
-  {%else %}
-    {% for blog in blogs %}
-        <h2>{{blog.title}}</h2>
-    {% endfor %}
-  {% endif %}
+  {% for blog in blogs %}
+      <h2>{{blog.title}}</h2>
+  {% else %}
+    <h2>Doesn't look like you've made a blog yet</h2>
+  {% endfor %}
+  <a href="/new-blog">Create New Blog</a>
 </body>
 </html>
