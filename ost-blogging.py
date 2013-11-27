@@ -37,8 +37,13 @@ class MainHandler(webapp2.RequestHandler):
       self.redirect('/home')
     else:
       #else render splash page
+
+      url = users.create_login_url(self.request.uri)
+      url_linktext = 'Login'
+
       template_values = {
-        'blog_title': "Splash"
+        'url'          : url,
+        'url_linktext' : url_linktext
       }
 
       template = JINJA_ENVIRONMENT.get_template('index.html')
