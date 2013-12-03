@@ -9,7 +9,7 @@
   </nav>
   <h2>{{user}}</h2>
   {% for blog in blogs %}
-      <h3>{{blog.title}}</h3>
+      <h3><a href="/b/{{blog.title}}">{{blog.title}}</a></h3>
   {% else %}
     <h3>Doesn't look like you've made a blog yet</h3>
   {% endfor %}

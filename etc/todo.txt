@@ -1,0 +1,6 @@
+TODO:
+
+Anonymous redirect for user && blog
+i.e. create /u/* && /b/**
+
+

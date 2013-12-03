@@ -105,14 +105,42 @@ class CreateBlog(webapp2.RequestHandler):
     #redirect back to homepage
     self.redirect('/home')
 
+class ShowBlogPosts(webapp2.RequestHandler):
+  def get(self):
 
+    ##If blog doesn't exist redirect
 
+    logging.debug(self)
 
+    #get current blog
+    blog_title = "Blog-Title"
+
+    #get all posts of blog
+    ## order by date
+    blog_posts_query = Post.query(blog_title == Post.blog)
+    blog_posts = blog_posts_query.fetch()
+
+    #render template
+    template_values = {
+      'blog_title'    : blog_title,
+      'posts'   : blog_posts
+    }
+
+    template = JINJA_ENVIRONMENT.get_template('posts.html')
+    self.response.write(template.render(template_values))
+
+class does_not_exist(webapp2.RequestHandler):
+  def get(self):
+    print "<h1>That page doesn't exist</h1>"
+    print "<h2>Sorry :(</h2>"
 
 #Models
 class Post(ndb.Model):
   author = ndb.UserProperty()
   content = ndb.TextProperty()
+  title = ndb.StringProperty()
+  ## blog should be structuredProperty (Blog)
+  blog = ndb.StringProperty()
   date = ndb.DateTimeProperty(auto_now_add=True)
 
 class Blog(ndb.Model):
@@ -125,4 +153,6 @@ app = webapp2.WSGIApplication([
     ('/home', UserHome),
     ('/new-blog', NewBlog),
     ('/create-blog', CreateBlog),
+    ('/b/Blog-Title', ShowBlogPosts),
+    ('/4oh4error', does_not_exist)
 ], debug=True)

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+{% autoescape true %}
+<html>
+  <head>
+  </head>
+  <body>
+  <div id="content">
+    <h2>{{blog_title}}</h2>
+    {% for post in posts %}
+        <h3>{{post.title}}</h3>
+        <p>{{post.content}}</p>
+    {% else %}
+      <h3>Doesn't look like there are any posts yet.</h3>
+    {% endfor %}
+  </div>
+  </body>
+</html>
+{% endautoescape %}
