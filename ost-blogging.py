@@ -172,6 +172,21 @@ class CreatePost(webapp2.RequestHandler):
     #redirect back to homepage
     self.redirect('/b/'+blog_url_title)
 
+class ShowPost(webapp2.RequestHandler):
+  def get(self, blog_url_title, post_url_title):
+    blog = Blog.query(Blog.url_title == blog_url_title).get()
+    post = Post.query(Post.blog == blog_url_title and Post.url_title == post_url_title)
+
+    template_values = {
+      'blog' : blog,
+      'post' : post
+    }
+
+    template = JINJA_ENVIRONMENT.get_template('post.html')
+    self.response.write(template.render(template_values))
+
+
+
 class does_not_exist(webapp2.RequestHandler):
   def get(self):
     print "<h1>That page doesn't exist</h1>"
@@ -210,7 +225,7 @@ app = webapp2.WSGIApplication([
     #(r'/p/(.*)/edit-post', EditBlog),
     #('r/p/(.*)/update-post(.*), UpdatePost'),
     #('r/p/(.*)/delete-post(.*), DeletePost'),
-    #('r/p/(.*)/destroy-post(.*), Destroypost'),
-
-    ('/4oh4error', does_not_exist)
+    #('r/p/(.*)/destroy-post(.*), DestroyPost'),
+    (r'/p/(.*)/(.*)', ShowPost),
+    (r'/(.*)', does_not_exist)
 ], debug=True)
