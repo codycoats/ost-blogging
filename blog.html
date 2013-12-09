@@ -5,14 +5,14 @@
   </head>
   <body>
   <div id="content">
-    <h2>{{blog_title}}</h2>
+    <h2>{{blog.blog_title}}</h2>
     {% for post in posts %}
         <h3><a href="/p/{{blog.url_title}}/{{post.url_title}}">{{post.title}}</a></h3>
         <p>{{post.content}}</p>
     {% else %}
       <h3>Doesn't look like there are any posts yet.</h3>
     {% endfor %}
-    <a href="/p/{{blog.blog_url_title}}/new-post">Make a new post.</a>
+    <a href="/p/{{blog.url_title}}/new-post">Make a new post.</a>
   </div>
   </body>
 </html>

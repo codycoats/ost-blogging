@@ -160,6 +160,7 @@ class CreatePost(webapp2.RequestHandler):
         post.author = users.get_current_user()
     else:
       print "<h1> You must be logged in to create a post.</h1>"
+      print "<a href='/home'>Okay :(</a>))"
 
     post.title = self.request.get('title')
     post.url_title = ("_").join(post.title.split())
@@ -175,7 +176,9 @@ class CreatePost(webapp2.RequestHandler):
 class ShowPost(webapp2.RequestHandler):
   def get(self, blog_url_title, post_url_title):
     blog = Blog.query(Blog.url_title == blog_url_title).get()
-    post = Post.query(Post.blog == blog_url_title and Post.url_title == post_url_title)
+    post = Post.query(Post.blog == blog.title, Post.url_title == post_url_title).get()
+
+    logging.debug("Post found is: "+str(post))
 
     template_values = {
       'blog' : blog,
