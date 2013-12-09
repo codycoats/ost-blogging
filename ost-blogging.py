@@ -85,8 +85,13 @@ def blog_key(blog_name=DEFAULT_BLOG_NAME):
 
 class NewBlog(webapp2.RequestHandler):
   def get(self):
-    template = JINJA_ENVIRONMENT.get_template('new-blog.html')
-    self.response.write(template.render())
+    if users.get_current_user():
+      template = JINJA_ENVIRONMENT.get_template('new-blog.html')
+      self.response.write(template.render())
+    else:
+      template = JINJA_ENVIRONMENT.get_template('must-login.html')
+      template_values = { 'reason': 'Create a New Blog'}
+      self.response.write(template.render(template_values))
 
 class CreateBlog(webapp2.RequestHandler):
   def post(self):
