@@ -1,0 +1,17 @@
+<html>
+<head>
+  <title>New Post</title>
+</head>
+<body>
+
+  <h1> New Post for {{blog.title}}
+
+  <form action="/p/{{blog.url_title}}/create-post" method="post">
+      <input type="text" name="title" value="Post-Title">
+      <br >
+      <textarea name="content" >Lorem Ipsum...</textarea>
+      <input type="submit" value="Submit">
+  </form>
+
+</body>
+</html>

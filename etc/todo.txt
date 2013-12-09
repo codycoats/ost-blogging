@@ -1,6 +1,13 @@
 TODO:
 
-Anonymous redirect for user && blog
-i.e. create /u/* && /b/**
+--Anonymous redirect for user && blog
+  i.e. create /u/* && /b/**
+
+--dont allow blogs/posts to have spaces
+  strip spaces when saving the id
+  add extra field to keep it for title
+  so title v url
+
+
 
 

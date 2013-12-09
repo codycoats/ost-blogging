@@ -17,6 +17,7 @@
 from google.appengine.api import users
 from google.appengine.ext import ndb
 
+from string import maketrans
 import os, cgi, logging, webapp2, jinja2
 
 JINJA_ENVIRONMENT = jinja2.Environment(
@@ -25,7 +26,7 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     autoescape=True)
 
 DEFAULT_BLOG_NAME = 'default_blog'
-
+DEFAULT_POST_NAME = 'default_post'
 
 class MainHandler(webapp2.RequestHandler):
 
@@ -98,6 +99,9 @@ class CreateBlog(webapp2.RequestHandler):
         blog.owner = users.get_current_user()
 
     blog.title = self.request.get('title')
+    blog.url_title = ("_").join(blog.title.split())
+
+    logging.debug(blog.url_title)
 
     #store in DB
     blog.put()
@@ -105,29 +109,68 @@ class CreateBlog(webapp2.RequestHandler):
     #redirect back to homepage
     self.redirect('/home')
 
-class ShowBlogPosts(webapp2.RequestHandler):
-  def get(self):
+class ShowBlog(webapp2.RequestHandler):
+  def get(self, blog_url_title):
 
     ##If blog doesn't exist redirect
-
-    logging.debug(self)
+    logging.debug("ShowBlogPosts")
 
     #get current blog
-    blog_title = "Blog-Title"
+    logging.debug(blog_url_title[2:])
+    blog = Blog.query(Blog.url_title == blog_url_title).get()
 
     #get all posts of blog
     ## order by date
-    blog_posts_query = Post.query(blog_title == Post.blog)
+    blog_posts_query = Post.query(Post.blog == blog.title)
     blog_posts = blog_posts_query.fetch()
 
     #render template
     template_values = {
-      'blog_title'    : blog_title,
-      'posts'   : blog_posts
+      'blog_title'    : blog.title,
+      'blog_url_title': blog.url_title,
+      'posts'         : blog_posts
     }
 
-    template = JINJA_ENVIRONMENT.get_template('posts.html')
+    template = JINJA_ENVIRONMENT.get_template('blog.html')
     self.response.write(template.render(template_values))
+
+def post_key(post_name=DEFAULT_POST_NAME):
+    """Constructs a Datastore key for a Post entity with post_name."""
+    return ndb.Key('Post', post_name)
+
+class NewPost(webapp2.RequestHandler):
+  def get(self, blog_url_title):
+
+    blog = Blog.query(Blog.url_title == blog_url_title).get()
+
+    template_values = {
+      'blog' : blog
+    }
+
+    template = JINJA_ENVIRONMENT.get_template('new-post.html')
+    self.response.write(template.render(template_values))
+
+class CreatePost(webapp2.RequestHandler):
+  def post(self, blog_url_title):
+    #create new Blog Model
+    post_name = self.request.get('post_name',
+                                          DEFAULT_POST_NAME)
+    post = Post(parent=post_key(post_name))
+
+    if users.get_current_user():
+        post.author = users.get_current_user()
+    else:
+      print "<h1> You must be logged in to create a post.</h1>"
+
+    post.title = self.request.get('title')
+    post.content = self.request.get('content')
+    post.blog = Blog.query(Blog.url_title == blog_url_title).get().title
+
+    #store in DB
+    post.put()
+
+    #redirect back to homepage
+    self.redirect('/b/'+blog_url_title)
 
 class does_not_exist(webapp2.RequestHandler):
   def get(self):
@@ -135,24 +178,39 @@ class does_not_exist(webapp2.RequestHandler):
     print "<h2>Sorry :(</h2>"
 
 #Models
-class Post(ndb.Model):
-  author = ndb.UserProperty()
-  content = ndb.TextProperty()
-  title = ndb.StringProperty()
-  ## blog should be structuredProperty (Blog)
-  blog = ndb.StringProperty()
-  date = ndb.DateTimeProperty(auto_now_add=True)
-
+#
+#
 class Blog(ndb.Model):
   owner = ndb.UserProperty()
   title = ndb.StringProperty()
-  posts = ndb.StructuredProperty(Post, repeated=True)
+  url_title = ndb.StringProperty()
+
+class Post(ndb.Model):
+  author = ndb.UserProperty()
+  blog = ndb.StringProperty()
+  title = ndb.StringProperty()
+  url_title = ndb.StringProperty()
+  content = ndb.TextProperty()
+  date_created = ndb.DateTimeProperty(auto_now_add=True)
+  date_last_modified = ndb.DateTimeProperty(auto_now_add=True)
+  tags = ndb.StringProperty(repeated=True)
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/home', UserHome),
-    ('/new-blog', NewBlog),
-    ('/create-blog', CreateBlog),
-    ('/b/Blog-Title', ShowBlogPosts),
+    ('/b/new-blog', NewBlog),
+    ('/b/create-blog', CreateBlog),
+    #(r'/b/(.*)/edit-blog', EditBlog),
+    #('r/b/(.*)/update-blog(.*), UpdateBlog'),
+    #('r/b/(.*)/delete-blog(.*), DeleteBlog'),
+    #('r/b/(.*)/destroy-blog(.*), DestroyBlog'),
+    (r'/b/(.*)', ShowBlog),
+    (r'/p/(.*)/new-post', NewPost),
+    (r'/p/(.*)/create-post', CreatePost),
+    #(r'/p/(.*)/edit-post', EditBlog),
+    #('r/p/(.*)/update-post(.*), UpdatePost'),
+    #('r/p/(.*)/delete-post(.*), DeletePost'),
+    #('r/p/(.*)/destroy-post(.*), Destroypost'),
+
     ('/4oh4error', does_not_exist)
 ], debug=True)
