@@ -122,13 +122,12 @@ class ShowBlog(webapp2.RequestHandler):
     #get all posts of blog
     ## order by date
     blog_posts_query = Post.query(Post.blog == blog.title)
-    blog_posts = blog_posts_query.fetch()
+    posts = blog_posts_query.fetch()
 
     #render template
     template_values = {
-      'blog_title'    : blog.title,
-      'blog_url_title': blog.url_title,
-      'posts'         : blog_posts
+      'blog'    : blog,
+      'posts'   : posts
     }
 
     template = JINJA_ENVIRONMENT.get_template('blog.html')
@@ -163,6 +162,7 @@ class CreatePost(webapp2.RequestHandler):
       print "<h1> You must be logged in to create a post.</h1>"
 
     post.title = self.request.get('title')
+    post.url_title = ("_").join(post.title.split())
     post.content = self.request.get('content')
     post.blog = Blog.query(Blog.url_title == blog_url_title).get().title
 
