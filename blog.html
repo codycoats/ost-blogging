@@ -5,14 +5,18 @@
   </head>
   <body>
   <div id="content">
-    <h2>{{blog.title}}</h2>
-    {% for post in posts %}
-        <h3><a href="/p/{{blog.url_title}}/{{post.url_title}}">{{post.title}}</a></h3>
-        <p>{{post.content}}</p>
+    {%if not found%}
+      <h1>Blog not found :(</h1>
     {% else %}
-      <h3>Doesn't look like there are any posts yet.</h3>
-    {% endfor %}
-    <a href="/p/{{blog.url_title}}/new-post">Make a new post.</a>
+    <h2>{{blog.title}}</h2>
+      {% for post in posts %}
+          <h3><a href="/p/{{blog.url_title}}/{{post.url_title}}">{{post.title}}</a></h3>
+          <p>{{post.content}}</p>
+      {% else %}
+        <h3>Doesn't look like there are any posts yet.</h3>
+      {% endfor %}
+      <a href="/p/{{blog.url_title}}/new-post">Make a new post.</a>
+    {%endif%}
   </div>
   </body>
 </html>
