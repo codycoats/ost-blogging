@@ -5,7 +5,7 @@
   </head>
   <body>
   <div id="content">
-    <h2>{{blog.blog_title}}</h2>
+    <h2>{{blog.title}}</h2>
     {% for post in posts %}
         <h3><a href="/p/{{blog.url_title}}/{{post.url_title}}">{{post.title}}</a></h3>
         <p>{{post.content}}</p>
