@@ -22,7 +22,9 @@
           <h3>Doesn't look like there are any posts yet.</h3>
         </ul>
         {% endfor %}
-        <a href="/p/{{blog.url_title}}/new-post">Make a new post.</a>
+        {% if user == 'owner'%}
+          <a href="/p/{{blog.url_title}}/new-post">Make a new post.</a>
+        {%endif%}
       </div>
     {%endif%}
   </div>

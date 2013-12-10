@@ -135,11 +135,20 @@ class ShowBlog(webapp2.RequestHandler):
         'blog'    : blog,
         'posts'   : posts
       }
+
+      ##check if owner is viewing
+      if (users.get_current_user() == blog.owner):
+        template_values['user'] = 'owner'
+      else:
+        template_values['user'] = 'visitor'
+
     else:
       logging.debug("Blog not found");
       template_values = {
           'found': False
       }
+
+
 
 
     template = JINJA_ENVIRONMENT.get_template('blog.html')
