@@ -10,13 +10,20 @@
       <h1>Blog not found :(</h1>
     {% else %}
     <h2>{{blog.title}}</h2>
-      {% for post in posts %}
-          <h3><a href="/p/{{blog.url_title}}/{{post.url_title}}">{{post.title}}</a></h3>
-          <p>{{post.content}}</p>
-      {% else %}
-        <h3>Doesn't look like there are any posts yet.</h3>
-      {% endfor %}
-      <a href="/p/{{blog.url_title}}/new-post">Make a new post.</a>
+    <div id="posts">
+        <ul>
+        {% for post in posts %}
+            <li>
+              <h3><a href="/p/{{blog.url_title}}/{{post.url_title}}">{{post.title}}</a></h3>
+              <h4>{{post.author}} | {{post.date_created.date()}}</h4>
+              <p>{{post.content}}</p>
+            </li>
+        {% else %}
+          <h3>Doesn't look like there are any posts yet.</h3>
+        </ul>
+        {% endfor %}
+        <a href="/p/{{blog.url_title}}/new-post">Make a new post.</a>
+      </div>
     {%endif%}
   </div>
   </body>
