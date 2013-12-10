@@ -1,4 +1,4 @@
-application: ost-blogging
+application: ostblogging
 version: 1
 runtime: python27
 api_version: 1
@@ -15,7 +15,7 @@ handlers:
   static_dir: static/fonts
 
 - url: .*
-  script: ost-blogging.app
+  script: ostblogging.app
 
 libraries:
 - name: webapp2
