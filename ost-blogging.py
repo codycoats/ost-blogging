@@ -124,9 +124,9 @@ class ShowBlog(webapp2.RequestHandler):
     ##If blog doesn't exist redirect
     if (blog):
       #get all posts of blog
-      ## order by date
       logging.debug(blog);
       blog_posts_query = Post.query(Post.blog == blog.title)
+      blog_posts_query.order(Post.date_created)
       posts = blog_posts_query.fetch()
 
       #render template
