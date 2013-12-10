@@ -6,13 +6,13 @@ threadsafe: yes
 
 handlers:
 - url: /css
-  static_dir: static_files/css
+  static_dir: css
+
+- url: /js
+  static_dir: js
 
 - url: /fonts
-  static_dir: static_files/fonts
-
--url: /js
-  static_dir: static_files/js
+  static_dir: static/fonts
 
 - url: .*
   script: ost-blogging.app
