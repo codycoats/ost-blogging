@@ -9,7 +9,10 @@
     <h1>Post not found :(</h1>
   {%else%}
     <h2>{{post.title}}</h2>
-    <h3>{{post.date_created.date()}}</h3>
+    <h3>Created - {{date_created}}</h3>
+    {% if date_last_modified %}
+    <h3> Last Modified - {{date_last_modified}}
+    {%endif%}
     <p>{{post.content}}</p>
   {%endif%}
 </body>
