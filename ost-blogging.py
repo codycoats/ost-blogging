@@ -206,6 +206,40 @@ class ShowPost(webapp2.RequestHandler):
     template = JINJA_ENVIRONMENT.get_template('post.html')
     self.response.write(template.render(template_values))
 
+class EditPost(webapp2.RequestHandler):
+  def get(self, blog_url_title, post_url_title):
+
+    blog = Blog.query(blog_url_title == Blog.url_title).get()
+    post = Post.query(post_url_title == Post.url_title and blog.title == Post.blog).get()
+
+    template_values = {
+      'blog' : blog,
+      'post' : post
+    }
+
+    template = JINJA_ENVIRONMENT.get_template('edit-post.html')
+    self.response.write(template.render(template_values))
+
+class UpdatePost(webapp2.RequestHandler):
+  def post(self, blog_url_title, post_url_title):
+
+    blog = Blog.query(blog_url_title == Blog.url_title).get()
+    post = Post.query(post_url_title == Post.url_title and blog.title == Post.blog).get()
+
+    if not (users.get_current_user() == post.author):
+      print "<h1> You must be logged and be the owner of the post to update it.</h1>"
+      print "<a href='/home'>Okay :(</a>))"
+
+    post.title = self.request.get('title')
+    post.url_title = ("_").join(post.title.split())
+    post.content = self.request.get('content')
+
+    #store in DB
+    post.put()
+
+    #redirect back to homepage
+    self.redirect('/p/'+blog_url_title+'/'+post_url_title)
+
 
 
 class does_not_exist(webapp2.RequestHandler):
@@ -228,7 +262,7 @@ class Post(ndb.Model):
   url_title = ndb.StringProperty()
   content = ndb.TextProperty()
   date_created = ndb.DateTimeProperty(auto_now_add=True)
-  date_last_modified = ndb.DateTimeProperty(auto_now_add=True)
+  date_last_modified = ndb.DateTimeProperty(auto_now=True)
   tags = ndb.StringProperty(repeated=True)
 
 app = webapp2.WSGIApplication([
@@ -243,8 +277,8 @@ app = webapp2.WSGIApplication([
     (r'/b/(.*)', ShowBlog),
     (r'/p/(.*)/new-post', NewPost),
     (r'/p/(.*)/create-post', CreatePost),
-    #(r'/p/(.*)/edit-post', EditBlog),
-    #('r/p/(.*)/update-post(.*), UpdatePost'),
+    (r'/p/(.*)/(.*)/edit-post', EditPost),
+    (r'/p/(.*)/(.*)/update-post', UpdatePost),
     #('r/p/(.*)/delete-post(.*), DeletePost'),
     #('r/p/(.*)/destroy-post(.*), DestroyPost'),
     (r'/p/(.*)/(.*)', ShowPost),

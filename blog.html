@@ -17,14 +17,18 @@
               <h3><a href="/p/{{blog.url_title}}/{{post.url_title}}">{{post.title}}</a></h3>
               <h4>{{post.author}} | {{post.date_created.date()}}</h4>
               <p>{{post.content}}</p>
+              <a href="/p/{{blog.url_title}}/{{post.url_title}}/edit-post" class="btn btn-warning">Edit Post</a>
+              <a href="/p/{{blog.url_title}}/{{post.url_title}}/delete-post" class="btn btn-danger">Delete Post</a>
             </li>
         {% else %}
           <h3>Doesn't look like there are any posts yet.</h3>
         </ul>
         {% endfor %}
         {% if user == 'owner'%}
-          <a href="/p/{{blog.url_title}}/new-post">Make a new post.</a>
+          <a href="/p/{{blog.url_title}}/new-post" class="btn btn-primary">Make a new post.</a>
         {%endif%}
+
+        <!-- needs older posts link-->
       </div>
     {%endif%}
   </div>
