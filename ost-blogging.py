@@ -127,7 +127,7 @@ class ShowBlog(webapp2.RequestHandler):
       logging.debug(blog);
       blog_posts_query = Post.query(Post.blog == blog.title)
       blog_posts_query.order(Post.date_created)
-      posts = blog_posts_query.fetch()
+      posts = blog_posts_query.fetch(limit=10)
 
       #render template
       template_values = {
@@ -147,9 +147,6 @@ class ShowBlog(webapp2.RequestHandler):
       template_values = {
           'found': False
       }
-
-
-
 
     template = JINJA_ENVIRONMENT.get_template('blog.html')
     self.response.write(template.render(template_values))
