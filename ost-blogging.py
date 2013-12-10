@@ -113,6 +113,8 @@ class CreateBlog(webapp2.RequestHandler):
 
     #redirect back to homepage
     self.redirect('/home')
+  def get(self):
+    self.redirect('/doesnotexist')
 
 class ShowBlog(webapp2.RequestHandler):
   def get(self, blog_url_title):
@@ -120,24 +122,25 @@ class ShowBlog(webapp2.RequestHandler):
     blog = Blog.query(Blog.url_title == blog_url_title).get()
 
     ##If blog doesn't exist redirect
-    logging.debug(blog)
-    if (blog is None):
-      logging.debug("Blog not found");
-      template_values = {
-          'found': False
-      }
-
-    else:
+    if (blog):
       #get all posts of blog
       ## order by date
+      logging.debug(blog);
       blog_posts_query = Post.query(Post.blog == blog.title)
       posts = blog_posts_query.fetch()
 
       #render template
       template_values = {
+        'found'   : True,
         'blog'    : blog,
         'posts'   : posts
       }
+    else:
+      logging.debug("Blog not found");
+      template_values = {
+          'found': False
+      }
+
 
     template = JINJA_ENVIRONMENT.get_template('blog.html')
     self.response.write(template.render(template_values))

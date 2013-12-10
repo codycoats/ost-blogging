@@ -4,7 +4,11 @@
 </head>
 <body>
   <h1>{{blog.title}}</h1>
-  <h2>{{post.title}}</h2>
-  <p>{{post.content}}</p>
+  {% if not post%}
+    <h1>Post not found :(</h1>
+  {%else%}
+    <h2>{{post.title}}</h2>
+    <p>{{post.content}}</p>
+  {%endif%}
 </body>
 </html>
