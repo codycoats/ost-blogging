@@ -43,7 +43,7 @@
             <li role="presentation"><a href="#">Another action</a></li>
             <li role="presentation"><a href="#">Something else here</a></li>
             <li class="divider"></li>
-            <li role="presentation"><a href="#">Separated link</a></li>
+            <li role="presentation"><a href="{{ url|safe }}">{{ url_linktext }}</a></li>
           </ul>
         </li>
       </ul>
@@ -51,7 +51,7 @@
   </nav>
 
   <div class="container">
-    <a href="{{ url|safe }}">{{ url_linktext }}</a>
+
     <h2>{{user}}</h2>
     {% for blog in blogs %}
         <h3><a href="/b/{{blog.url_title}}">{{blog.title}}</a></h3>
