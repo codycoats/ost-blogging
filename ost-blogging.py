@@ -202,8 +202,10 @@ class ShowPost(webapp2.RequestHandler):
       'blog' : blog,
       'post' : post,
       'date_created' : pretty_date(post.date_created),
-      'date_last_modified' : pretty_date(post.date_last_modified)
     }
+
+    if post.date_created != post.date_last_modified:
+      template_values['date_last_modified'] = pretty_date(post.date_last_modified)
 
     template = JINJA_ENVIRONMENT.get_template('post.html')
     self.response.write(template.render(template_values))
