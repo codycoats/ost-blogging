@@ -26,7 +26,7 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 
 
 DEFAULT_BLOG_NAME = 'default_blog'
-DEFAULT_POST_NAME = 'default_post'
+
 
 class MainHandler(webapp2.RequestHandler):
 
@@ -123,10 +123,7 @@ class ShowBlog(webapp2.RequestHandler):
     ##If blog doesn't exist redirect
     if (blog):
       #get all posts of blog
-      logging.debug(blog);
-      blog_posts_query = Post.query(Post.blog == blog.title)
-      blog_posts_query.order(-Post.date_created)
-      posts = blog_posts_query.fetch(limit=10)
+      posts = Post.query(Post.blog == blog.title).order(-Post.date_created).fetch(10)
 
       #render template
       template_values = {
@@ -150,9 +147,81 @@ class ShowBlog(webapp2.RequestHandler):
     template = JINJA_ENVIRONMENT.get_template('blog.html')
     self.response.write(template.render(template_values))
 
+class does_not_exist(webapp2.RequestHandler):
+  def get(self):
+    print "<h1>That page doesn't exist</h1>"
+    print "<h2>Sorry :(</h2>"
+
+def pretty_date(time=False):
+    """
+    Get a datetime object or a int() Epoch timestamp and return a
+    pretty string like 'an hour ago', 'Yesterday', '3 months ago',
+    'just now', etc
+    """
+    from datetime import datetime
+    now = datetime.now()
+    if type(time) is int:
+        diff = now - datetime.fromtimestamp(time)
+    elif isinstance(time,datetime):
+        diff = now - time
+    elif not time:
+        diff = now - now
+    second_diff = diff.seconds
+    day_diff = diff.days
+
+    if day_diff < 0:
+        return ''
+
+    if day_diff == 0:
+        if second_diff < 10:
+            return "just now"
+        if second_diff < 60:
+            return str(second_diff) + " seconds ago"
+        if second_diff < 120:
+            return  "a minute ago"
+        if second_diff < 3600:
+            return str( second_diff / 60 ) + " minutes ago"
+        if second_diff < 7200:
+            return "an hour ago"
+        if second_diff < 86400:
+            return str( second_diff / 3600 ) + " hours ago"
+    if day_diff == 1:
+        return "Yesterday"
+    if day_diff < 7:
+        return str(day_diff) + " days ago"
+    if day_diff < 31:
+        return str(day_diff/7) + " weeks ago"
+    if day_diff < 365:
+        return str(day_diff/30) + " months ago"
+    return str(day_diff/365) + " years ago"
+
+
+def format_number(number):
+    s = '%d' % number
+    groups = []
+    while s and s[-1].isdigit():
+        groups.append(s[-3:])
+        s = s[:-3]
+    return s + ','.join(reversed(groups))
+
+JINJA_ENVIRONMENT.filters['pretty_date'] = pretty_date
+
+
+DEFAULT_POST_NAME = 'default_post'
+
+class Post(ndb.Model):
+  author = ndb.UserProperty()
+  blog = ndb.StringProperty()
+  title = ndb.StringProperty()
+  url_title = ndb.StringProperty()
+  content = ndb.TextProperty()
+  date_created = ndb.DateTimeProperty(auto_now_add=True)
+  date_last_modified = ndb.DateTimeProperty(auto_now=True)
+  tags = ndb.StringProperty(repeated=True)
+
 def post_key(post_name=DEFAULT_POST_NAME):
-    """Constructs a Datastore key for a Post entity with post_name."""
-    return ndb.Key('Post', post_name)
+  """Constructs a Datastore key for a Post entity with post_name."""
+  return ndb.Key('Post', post_name)
 
 class NewPost(webapp2.RequestHandler):
   def get(self, blog_url_title):
@@ -244,82 +313,10 @@ class UpdatePost(webapp2.RequestHandler):
     #redirect back to homepage
     self.redirect('/p/'+blog_url_title+'/'+post.url_title)
 
-class does_not_exist(webapp2.RequestHandler):
-  def get(self):
-    print "<h1>That page doesn't exist</h1>"
-    print "<h2>Sorry :(</h2>"
-
-def pretty_date(time=False):
-    """
-    Get a datetime object or a int() Epoch timestamp and return a
-    pretty string like 'an hour ago', 'Yesterday', '3 months ago',
-    'just now', etc
-    """
-    from datetime import datetime
-    now = datetime.now()
-    if type(time) is int:
-        diff = now - datetime.fromtimestamp(time)
-    elif isinstance(time,datetime):
-        diff = now - time
-    elif not time:
-        diff = now - now
-    second_diff = diff.seconds
-    day_diff = diff.days
-
-    if day_diff < 0:
-        return ''
-
-    if day_diff == 0:
-        if second_diff < 10:
-            return "just now"
-        if second_diff < 60:
-            return str(second_diff) + " seconds ago"
-        if second_diff < 120:
-            return  "a minute ago"
-        if second_diff < 3600:
-            return str( second_diff / 60 ) + " minutes ago"
-        if second_diff < 7200:
-            return "an hour ago"
-        if second_diff < 86400:
-            return str( second_diff / 3600 ) + " hours ago"
-    if day_diff == 1:
-        return "Yesterday"
-    if day_diff < 7:
-        return str(day_diff) + " days ago"
-    if day_diff < 31:
-        return str(day_diff/7) + " weeks ago"
-    if day_diff < 365:
-        return str(day_diff/30) + " months ago"
-    return str(day_diff/365) + " years ago"
-
-
-def format_number(number):
-    s = '%d' % number
-    groups = []
-    while s and s[-1].isdigit():
-        groups.append(s[-3:])
-        s = s[:-3]
-    return s + ','.join(reversed(groups))
-
-JINJA_ENVIRONMENT.filters['pretty_date'] = pretty_date
-
-#Models
-#
-#
 class Blog(ndb.Model):
   owner = ndb.UserProperty()
   title = ndb.StringProperty()
   url_title = ndb.StringProperty()
-
-class Post(ndb.Model):
-  author = ndb.UserProperty()
-  blog = ndb.StringProperty()
-  title = ndb.StringProperty()
-  url_title = ndb.StringProperty()
-  content = ndb.TextProperty()
-  date_created = ndb.DateTimeProperty(auto_now_add=True)
-  date_last_modified = ndb.DateTimeProperty(auto_now=True)
-  tags = ndb.StringProperty(repeated=True)
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),

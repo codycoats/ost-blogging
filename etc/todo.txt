@@ -11,3 +11,5 @@ TODO:
 
 -- fix sort order
 
+--add id to post/blog urls
+
