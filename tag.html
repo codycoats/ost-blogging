@@ -62,7 +62,7 @@
       {% for post in posts %}
           <li class="list-group-item">
             <section class="">
-              <h2><a href="/p/{{blog.url_title}}/{{post.url_title}}">{{post.title}}</a></h2>
+              <h2>{{post.title}}</h2>
               <small class="text-right">Created - {{post.date_created|pretty_date}}</small>
               <small class="text-right"> Last Modified - {{ post.date_last_modified|pretty_date }}</small>
             </section>
