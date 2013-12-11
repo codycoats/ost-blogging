@@ -3,6 +3,7 @@
 <head>
   <title>{{blog.title}}-{{post.title}}</title>
   <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/styles.css">
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
   <script src="/js/bootstrap.min.js"></script>
 </head>
@@ -64,7 +65,7 @@
           <small class=""> Last Modified - {{post.date_last_modified|pretty_date}}</small>
           <ul class="list-unstyled list-inline pull-right">
             {% for t in post.tags %}
-              <li>{{ t }}</li>
+              <li><a href="/t/{{t}}" class="badge">{{t}}</a></li>
             {% endfor %}
           </ul>
       </section>

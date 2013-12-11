@@ -1,0 +1,13 @@
+.badge{
+  background-color: #455290;
+  padding: 3px 5px;
+
+  box-shadow: 1px 1px 1px #333;
+}
+
+.badge:hover{
+  text-decoration: none;
+  background-color: #3B467A;
+  color: white;
+  box-shadow: 2px 2px 2px #333;
+}
