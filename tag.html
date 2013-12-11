@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+{% autoescape true %}
+<html>
+  <head>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+  </head>
+  <body>
+  <nav class="navbar navbar-inverse navbar-static-top" role="navigation">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#">OST</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="#">Link</a></li>
+        <li><a href="#">Link</a></li>
+      </ul>
+      <form class="navbar-form navbar-left" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search">
+        </div>
+        <button type="submit" class="btn btn-default">Submit</button>
+      </form>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="/home"><span class="glyphicon glyphicon-home"></span>Home</a></li>
+        <li class="dropdown">
+          <a href="#" id="account-dropdown" role="button" class="dropdown-toggle" data-toggle="dropdown" >
+            Account
+            <b class="caret"></b>
+          </a>
+          <ul class="dropdown-menu" role="menu" aria-labelledby="account-dropdown">
+            <li role="presentation"><a href="#">Action</a></li>
+            <li role="presentation"><a href="#">Another action</a></li>
+            <li role="presentation"><a href="#">Something else here</a></li>
+            <li class="divider"></li>
+            <li role="presentation"><a href="{{ url|safe }}">{{ url_linktext }}</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+  <div class="content">
+    <div class="page-header">
+      <h1 class="text-center">{{tag}}</small></h1>
+    </div>
+
+    <div class="panel panel-default">
+<!--       <div class="panel-body">
+      </div> -->
+      <ul class="list-group">
+      {% for post in posts %}
+          <li class="list-group-item">
+            <section class="">
+              <h2><a href="/p/{{blog.url_title}}/{{post.url_title}}">{{post.title}}</a></h2>
+              <small class="text-right">Created - {{post.date_created|pretty_date}}</small>
+              <small class="text-right"> Last Modified - {{ post.date_last_modified|pretty_date }}</small>
+            </section>
+            <section class="">
+              <p>{{post.content}}</p>
+            </section>
+          </li>
+      {% else %}
+      <h2> No posts with that tag</h2>
+      {% endfor %}
+      </ul>
+  </div>
+  </body>
+</html>
+{% endautoescape %}

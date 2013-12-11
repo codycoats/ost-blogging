@@ -6,6 +6,6 @@ import re
 #output: ['#tag1', '#tag2', '#tag3']
 def parse_tags(string):
 
-  tags = re.findall(r'#\S+', string)
+  tags = re.findall(r'\S+', string)
 
   return tags
