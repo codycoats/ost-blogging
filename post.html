@@ -60,10 +60,8 @@
           <h1 class="">Post not found :(</h1>
         {%else%}
           <h2 class="panel-title">{{post.title}}</h2>
-          <small class="text-right">Created - {{date_created}}</small>
-        {% if date_last_modified %}
-          <small class="text-right"> Last Modified - {{date_last_modified}}</small>
-        {%endif%}
+          <small class="text-right">Created - {{post.date_created|pretty_date}}</small>
+          <small class="text-right"> Last Modified - {{post.date_last_modified|pretty_date}}</small>
       </section>
       <section class="panel-body">
         <p>{{post.content}}</p>

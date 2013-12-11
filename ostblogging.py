@@ -64,7 +64,6 @@ class UserHome(webapp2.RequestHandler):
       url = users.create_logout_url(self.request.uri)
       url_linktext = 'Logout'
 
-      logging.debug(url, url_linktext)
 
       template_values = {
         'user'    : user,
@@ -193,19 +192,15 @@ class CreatePost(webapp2.RequestHandler):
 
 class ShowPost(webapp2.RequestHandler):
   def get(self, blog_url_title, post_url_title):
-    blog = Blog.query(Blog.url_title == blog_url_title).get()
-    post = Post.query(Post.blog == blog.title, Post.url_title == post_url_title).get()
+    blog = Blog.query(blog_url_title == Blog.url_title).get()
+    post = Post.query(blog.title == Post.blog, post_url_title == Post.url_title).get()
 
     logging.debug("Post found is: "+str(post))
 
     template_values = {
       'blog' : blog,
       'post' : post,
-      'date_created' : pretty_date(post.date_created),
     }
-
-    if post.date_created != post.date_last_modified:
-      template_values['date_last_modified'] = pretty_date(post.date_last_modified)
 
     template = JINJA_ENVIRONMENT.get_template('post.html')
     self.response.write(template.render(template_values))
@@ -213,8 +208,13 @@ class ShowPost(webapp2.RequestHandler):
 class EditPost(webapp2.RequestHandler):
   def get(self, blog_url_title, post_url_title):
 
+    print(blog_url_title)
+    print(post_url_title)
+
     blog = Blog.query(blog_url_title == Blog.url_title).get()
-    post = Post.query(post_url_title == Post.url_title and blog.title == Post.blog).get()
+    post = Post.query(blog.title == Post.blog, post_url_title == Post.url_title).get()
+
+    print(post.url_title == post_url_title)
 
     template_values = {
       'blog' : blog,
@@ -228,7 +228,7 @@ class UpdatePost(webapp2.RequestHandler):
   def post(self, blog_url_title, post_url_title):
 
     blog = Blog.query(blog_url_title == Blog.url_title).get()
-    post = Post.query(post_url_title == Post.url_title and blog.title == Post.blog).get()
+    post = Post.query(blog.title == Post.blog, post_url_title == Post.url_title).get()
 
     if not (users.get_current_user() == post.author):
       print "<h1> You must be logged and be the owner of the post to update it.</h1>"
@@ -242,7 +242,7 @@ class UpdatePost(webapp2.RequestHandler):
     post.put()
 
     #redirect back to homepage
-    self.redirect('/p/'+blog_url_title+'/'+post_url_title)
+    self.redirect('/p/'+blog_url_title+'/'+post.url_title)
 
 class does_not_exist(webapp2.RequestHandler):
   def get(self):
