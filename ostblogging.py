@@ -313,6 +313,37 @@ class UpdatePost(webapp2.RequestHandler):
     #redirect back to homepage
     self.redirect('/p/'+blog_url_title+'/'+post.url_title)
 
+class DeletePost(webapp2.RequestHandler):
+  def get(self, blog_url_title, post_url_title):
+    blog = Blog.query(blog_url_title == Blog.url_title).get()
+    post = Post.query(blog.title == Post.blog, post_url_title == Post.url_title).get()
+
+    template_values = {
+      'blog' : blog,
+      'post' : post
+    }
+
+    template = JINJA_ENVIRONMENT.get_template('delete-post.html')
+    self.response.write(template.render(template_values))
+
+class DestroyPost(webapp2.RequestHandler):
+  def post(self, blog_url_title, post_url_title):
+
+    blog = Blog.query(blog_url_title == Blog.url_title).get()
+    post = Post.query(blog.title == Post.blog, post_url_title == Post.url_title).get()
+
+    print(post)
+
+    if not (users.get_current_user() == post.author):
+      print "<h1> You must be logged and be the owner of the post to delete it.</h1>"
+      print "<a href='/home'>Okay :(</a>))"
+
+    #store in DB
+    post.key.delete()
+
+    #redirect back to homepage
+    self.redirect('/b/'+blog_url_title)
+
 class Blog(ndb.Model):
   owner = ndb.UserProperty()
   title = ndb.StringProperty()
@@ -332,8 +363,8 @@ app = webapp2.WSGIApplication([
     (r'/p/(.*)/create-post', CreatePost),
     (r'/p/(.*)/(.*)/edit-post', EditPost),
     (r'/p/(.*)/(.*)/update-post', UpdatePost),
-    #('r/p/(.*)/delete-post(.*), DeletePost'),
-    #('r/p/(.*)/destroy-post(.*), DestroyPost'),
+    (r'/p/(.*)/(.*)/delete-post', DeletePost),
+    (r'/p/(.*)/(.*)/destroy-post', DestroyPost),
     (r'/p/(.*)/(.*)', ShowPost),
     (r'/(.*)', does_not_exist)
 ], debug=True)
