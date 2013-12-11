@@ -52,7 +52,7 @@
 
   <div class="content">
     {%if not found%}
-      <h1>Blog not found :(</h1>
+      <h1>Blog not found</h1>
     {% else %}
     <div class="page-header">
       <h1 class="text-center">{{blog.title}} <small>by {{blog.owner}}</small></h1>
@@ -67,7 +67,7 @@
             <section class="">
               <h2><a href="/p/{{blog.url_title}}/{{post.url_title}}">{{post.title}}</a></h2>
               <small class="text-right">Created - {{post.date_created.date()}}</small>
-              <small class="text-right"> Last Modified - {{post.date_last_modified.date()}}</small>
+              <small class="text-right"> Last Modified - {{ post.date_last_modified|pretty_date }}</small>
             </section>
             <section class="">
               <p>{{post.content}}</p>

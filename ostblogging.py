@@ -17,13 +17,13 @@
 from google.appengine.api import users
 from google.appengine.ext import ndb
 
-from string import maketrans
 import os, cgi, logging, webapp2, jinja2
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
     extensions=['jinja2.ext.autoescape'],
     autoescape=True)
+
 
 DEFAULT_BLOG_NAME = 'default_blog'
 DEFAULT_POST_NAME = 'default_post'
@@ -126,14 +126,14 @@ class ShowBlog(webapp2.RequestHandler):
       #get all posts of blog
       logging.debug(blog);
       blog_posts_query = Post.query(Post.blog == blog.title)
-      blog_posts_query.order(Post.date_created)
+      blog_posts_query.order(-Post.date_created)
       posts = blog_posts_query.fetch(limit=10)
 
       #render template
       template_values = {
         'found'   : True,
         'blog'    : blog,
-        'posts'   : posts
+        'posts'   : posts,
       }
 
       ##check if owner is viewing
@@ -249,46 +249,7 @@ class does_not_exist(webapp2.RequestHandler):
     print "<h1>That page doesn't exist</h1>"
     print "<h2>Sorry :(</h2>"
 
-#Models
-#
-#
-class Blog(ndb.Model):
-  owner = ndb.UserProperty()
-  title = ndb.StringProperty()
-  url_title = ndb.StringProperty()
-
-class Post(ndb.Model):
-  author = ndb.UserProperty()
-  blog = ndb.StringProperty()
-  title = ndb.StringProperty()
-  url_title = ndb.StringProperty()
-  content = ndb.TextProperty()
-  date_created = ndb.DateTimeProperty(auto_now_add=True)
-  date_last_modified = ndb.DateTimeProperty(auto_now=True)
-  tags = ndb.StringProperty(repeated=True)
-
-app = webapp2.WSGIApplication([
-    ('/', MainHandler),
-    ('/home', UserHome),
-    ('/b/new-blog', NewBlog),
-    ('/b/create-blog', CreateBlog),
-    #(r'/b/(.*)/edit-blog', EditBlog),
-    #('r/b/(.*)/update-blog(.*), UpdateBlog'),
-    #('r/b/(.*)/delete-blog(.*), DeleteBlog'),
-    #('r/b/(.*)/destroy-blog(.*), DestroyBlog'),
-    (r'/b/(.*)', ShowBlog),
-    (r'/p/(.*)/new-post', NewPost),
-    (r'/p/(.*)/create-post', CreatePost),
-    (r'/p/(.*)/(.*)/edit-post', EditPost),
-    (r'/p/(.*)/(.*)/update-post', UpdatePost),
-    #('r/p/(.*)/delete-post(.*), DeletePost'),
-    #('r/p/(.*)/destroy-post(.*), DestroyPost'),
-    (r'/p/(.*)/(.*)', ShowPost),
-    (r'/(.*)', does_not_exist)
-], debug=True)
-
 def pretty_date(time=False):
-    ##http://evaisse.com/post/93417709/python-pretty-date-function
     """
     Get a datetime object or a int() Epoch timestamp and return a
     pretty string like 'an hour ago', 'Yesterday', '3 months ago',
@@ -330,3 +291,52 @@ def pretty_date(time=False):
     if day_diff < 365:
         return str(day_diff/30) + " months ago"
     return str(day_diff/365) + " years ago"
+
+
+def format_number(number):
+    s = '%d' % number
+    groups = []
+    while s and s[-1].isdigit():
+        groups.append(s[-3:])
+        s = s[:-3]
+    return s + ','.join(reversed(groups))
+
+JINJA_ENVIRONMENT.filters['pretty_date'] = pretty_date
+
+#Models
+#
+#
+class Blog(ndb.Model):
+  owner = ndb.UserProperty()
+  title = ndb.StringProperty()
+  url_title = ndb.StringProperty()
+
+class Post(ndb.Model):
+  author = ndb.UserProperty()
+  blog = ndb.StringProperty()
+  title = ndb.StringProperty()
+  url_title = ndb.StringProperty()
+  content = ndb.TextProperty()
+  date_created = ndb.DateTimeProperty(auto_now_add=True)
+  date_last_modified = ndb.DateTimeProperty(auto_now=True)
+  tags = ndb.StringProperty(repeated=True)
+
+app = webapp2.WSGIApplication([
+    ('/', MainHandler),
+    ('/home', UserHome),
+    ('/b/new-blog', NewBlog),
+    ('/b/create-blog', CreateBlog),
+    #(r'/b/(.*)/edit-blog', EditBlog),
+    #('r/b/(.*)/update-blog(.*), UpdateBlog'),
+    #('r/b/(.*)/delete-blog(.*), DeleteBlog'),
+    #('r/b/(.*)/destroy-blog(.*), DestroyBlog'),
+    (r'/b/(.*)', ShowBlog),
+    (r'/p/(.*)/new-post', NewPost),
+    (r'/p/(.*)/create-post', CreatePost),
+    (r'/p/(.*)/(.*)/edit-post', EditPost),
+    (r'/p/(.*)/(.*)/update-post', UpdatePost),
+    #('r/p/(.*)/delete-post(.*), DeletePost'),
+    #('r/p/(.*)/destroy-post(.*), DestroyPost'),
+    (r'/p/(.*)/(.*)', ShowPost),
+    (r'/(.*)', does_not_exist)
+], debug=True)
