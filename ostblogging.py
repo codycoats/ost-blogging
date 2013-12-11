@@ -19,7 +19,6 @@ from google.appengine.ext import ndb
 
 import os, cgi, logging, webapp2, jinja2
 from helpers import parse_tags
-import pickle
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
