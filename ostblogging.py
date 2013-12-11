@@ -353,9 +353,10 @@ class DestroyPost(webapp2.RequestHandler):
 
 class SearchTag(webapp2.RequestHandler):
   def get(self, tag):
-    posts = Post.query(Post.tags == tag)
+    if tag == "":
+      tag = self.request.get('tag')
 
-    print(tag)
+    posts = Post.query(Post.tags == tag)
 
     template_values = {
       'tag'   : tag,
@@ -387,6 +388,7 @@ app = webapp2.WSGIApplication([
     (r'/p/(.*)/(.*)/delete-post', DeletePost),
     (r'/p/(.*)/(.*)/destroy-post', DestroyPost),
     (r'/p/(.*)/(.*)', ShowPost),
+    (r'/t/?(.*)', SearchTag),
     (r'/t/(.*)', SearchTag),
     (r'/(.*)', does_not_exist)
 ], debug=True)
