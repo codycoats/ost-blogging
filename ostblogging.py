@@ -18,6 +18,8 @@ from google.appengine.api import users
 from google.appengine.ext import ndb
 
 import os, cgi, logging, webapp2, jinja2
+from helpers import parse_tags
+import pickle
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -248,6 +250,12 @@ class CreatePost(webapp2.RequestHandler):
       print "<h1> You must be logged in to create a post.</h1>"
       print "<a href='/home'>Okay :(</a>))"
 
+    #get tags
+    tags_s = self.request.get('tags')
+    tags_l = parse_tags(tags_s)
+
+    post.tags = tags_l
+    print(len(post.tags))
     post.title = self.request.get('title')
     post.url_title = ("_").join(post.title.split())
     post.content = self.request.get('content')
@@ -265,6 +273,8 @@ class ShowPost(webapp2.RequestHandler):
     post = Post.query(blog.title == Post.blog, post_url_title == Post.url_title).get()
 
     logging.debug("Post found is: "+str(post))
+
+    print(len(post.tags))
 
     template_values = {
       'blog' : blog,
