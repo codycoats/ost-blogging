@@ -215,7 +215,8 @@ class Post(ndb.Model):
   blog = ndb.StringProperty()
   title = ndb.StringProperty()
   url_title = ndb.StringProperty()
-  content = ndb.TextProperty()
+  short_content = ndb.TextProperty()
+  long_content = ndb.TextProperty()
   date_created = ndb.DateTimeProperty(auto_now_add=True)
   date_last_modified = ndb.DateTimeProperty(auto_now=True)
   tags = ndb.StringProperty(repeated=True)
@@ -253,11 +254,18 @@ class CreatePost(webapp2.RequestHandler):
     tags_s = self.request.get('tags')
     tags_l = parse_tags(tags_s)
 
+    content = self.request.get('content')
+    short_content = content[:500]
+
+    if content != short_content:
+      short_content+="..."
+
     post.tags = tags_l
     print(len(post.tags))
     post.title = self.request.get('title')
     post.url_title = ("_").join(post.title.split())
-    post.content = self.request.get('content')
+    post.long_content = content
+    post.short_content = short_content
     post.blog = Blog.query(Blog.url_title == blog_url_title).get().title
 
     #store in DB
@@ -312,9 +320,16 @@ class UpdatePost(webapp2.RequestHandler):
       print "<h1> You must be logged and be the owner of the post to update it.</h1>"
       print "<a href='/home'>Okay :(</a>))"
 
+    content = self.request.get('content')
+    short_content = content[:500]
+
+    if content != short_content:
+      short_content+="..."
+
     post.title = self.request.get('title')
     post.url_title = ("_").join(post.title.split())
-    post.content = self.request.get('content')
+    post.long_content = content
+    post.short_content = short_content
 
     #store in DB
     post.put()
