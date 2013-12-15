@@ -379,7 +379,7 @@ class SearchTag(webapp2.RequestHandler):
     if tag == "":
       tag = self.request.get('tag')
 
-    posts = Post.query(Post.tags == tag)
+    posts = Post.query(Post.tags == tag).order(-Post.date_created).fetch()
 
     template_values = {
       'tag'   : tag,

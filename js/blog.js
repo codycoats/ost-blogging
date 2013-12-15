@@ -36,7 +36,7 @@ $(function(){
       $('#post-page-prev').removeClass('disabled');
     }
 
-    if(post_end >= total_posts){
+    if(post_end > total_posts){
      $('#post-page-next').addClass('disabled');
     }
     else{
