@@ -57,6 +57,12 @@
       <div class="form-group">
         <label for="title">Title</label>
         <input type="text" name="title" class="form-control" value="{{post.title}}">
+        <label for="tags">Tags</label>
+        <input type="text" name="tags" placeholder="awesome tags go here" class="form-control">
+        {%for tag in post.tags%}
+          {{tag}}
+        {%endfor%}
+        </input>
         <br>
         <label for="content">Content</label>
         <textarea name="content" class="form-control">{{post.content}}</textarea>
