@@ -62,7 +62,7 @@
     <div class="panel panel-default">
 <!--       <div class="panel-body">
       </div> -->
-      <ul id="post-list" class="list-group" data-posttotal="{{posts|length}}" data-pageindex="1">
+      <ul id="post-list" class="list-group" data-posttotal="{{posts|length}}" data-pageindex="0">
       {% for post in posts %}
           <li class="list-group-item" data-postindex="{{loop.index}}">
             <section class="">
@@ -81,8 +81,8 @@
           {%if loop.last%}
             </ul>
             <ul class="pager">
-              <li class="previous" id="post-page-prev"><a href="#">&larr; Older</a></li>
-              <li class="next" id="post-page-next"><a href="#">Newer &rarr;</a></li>
+              <li class="previous" id="post-page-prev"><a href="#">&larr; Newer</a></li>
+              <li class="next" id="post-page-next"><a href="#">Older &rarr;</a></li>
             </ul>
           {% endif %}
       {% else %}
