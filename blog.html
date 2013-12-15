@@ -62,9 +62,9 @@
     <div class="panel panel-default">
 <!--       <div class="panel-body">
       </div> -->
-      <ul class="list-group">
+      <ul id="post-list" class="list-group" data-posttotal="{{posts|length}}" data-pageindex="1">
       {% for post in posts %}
-          <li class="list-group-item">
+          <li class="list-group-item" data-postindex="{{loop.index}}">
             <section class="">
               <h2><a href="/p/{{blog.url_title}}/{{post.url_title}}">{{post.title}}</a></h2>
               <small class="text-right">Created - {{post.date_created|pretty_date}}</small>
@@ -78,10 +78,17 @@
               <a href="/p/{{blog.url_title}}/{{post.url_title}}/delete-post" class="btn btn-danger">Delete Post</a>
             {%endif%}
           </li>
+          {%if loop.last%}
+            </ul>
+            <ul class="pager">
+              <li class="previous" id="post-page-prev"><a href="#">&larr; Older</a></li>
+              <li class="next" id="post-page-next"><a href="#">Newer &rarr;</a></li>
+            </ul>
+          {% endif %}
       {% else %}
       <h3> No posts yet</h3>
       {% endfor %}
-      </ul>
+
 
       {% if user == 'owner'%}
       <div class="panel-footer">

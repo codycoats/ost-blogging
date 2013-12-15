@@ -17,7 +17,7 @@
 from google.appengine.api import users
 from google.appengine.ext import ndb
 
-import os, cgi, logging, webapp2, jinja2
+import os, cgi, logging, webapp2, jinja2, math
 from helpers import parse_tags
 
 JINJA_ENVIRONMENT = jinja2.Environment(
@@ -124,13 +124,17 @@ class ShowBlog(webapp2.RequestHandler):
     ##If blog doesn't exist redirect
     if (blog):
       #get all posts of blog
-      posts = Post.query(Post.blog == blog.title).order(-Post.date_created).fetch(10)
+      posts = Post.query(Post.blog == blog.title).order(-Post.date_created).fetch()
+
+      num_pages = int(math.ceil(len(posts)/10.0))
+      print num_pages
 
       #render template
       template_values = {
         'found'   : True,
         'blog'    : blog,
         'posts'   : posts,
+        'num_pages' : num_pages
       }
 
       ##check if owner is viewing
