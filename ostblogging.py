@@ -265,7 +265,6 @@ class CreatePost(webapp2.RequestHandler):
       short_content+="..."
 
     post.tags = tags_l
-    print(len(post.tags))
     post.title = self.request.get('title')
     post.url_title = ("_").join(post.title.split())
     post.long_content = content
@@ -330,6 +329,11 @@ class UpdatePost(webapp2.RequestHandler):
     if content != short_content:
       short_content+="..."
 
+    #get tags
+    tags_s = self.request.get('tags')
+    tags_l = parse_tags(tags_s)
+
+    post.tags = tags_l
     post.title = self.request.get('title')
     post.url_title = ("_").join(post.title.split())
     post.long_content = content
