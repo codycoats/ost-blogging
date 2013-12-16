@@ -60,11 +60,3 @@ def pretty_date(time=False):
     if day_diff < 365:
         return str(day_diff/30) + " months ago"
     return str(day_diff/365) + " years ago"
-
-def format_number(number):
-    s = '%d' % number
-    groups = []
-    while s and s[-1].isdigit():
-        groups.append(s[-3:])
-        s = s[:-3]
-    return s + ','.join(reversed(groups))
