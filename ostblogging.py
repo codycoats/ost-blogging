@@ -36,8 +36,6 @@ DEFAULT_IMAGE_NAME = 'default_image'
 DEFAULT_POST_NAME = 'default_post'
 
 
-
-
 class MainHandler(webapp2.RequestHandler):
 
   def get(self):
