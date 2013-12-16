@@ -11,10 +11,18 @@
 
   <div class="container">
 
+  {% for error in errors %}
+    <div class="alert alert-danger"><strong>Error:</strong> {{error}}</div>
+  {% endfor %}
+
     <form action="/b/create-blog" method="post" role="form">
       <div class="form-group">
         <label for="title">Blog Title</label>
-        <input type="text" name="title" class="form-control" placeholder="My Awesome Blog">
+        {%if blog%}
+          <input type="text" name="title" class="form-control" value="{{blog.title}}">
+        {%else%}
+          <input type="text" name="title" class="form-control" placeholder="My Awesome Blog">
+        {%endif%}
       </div>
       <button type="submit" class="btn btn-primary">Submit</button>
     </form>

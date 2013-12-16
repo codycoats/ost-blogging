@@ -107,24 +107,43 @@ class NewBlog(webapp2.RequestHandler):
 
 class CreateBlog(webapp2.RequestHandler):
   def post(self):
+
+    errors = [];
+
     #create new Blog Model
     blog_name = self.request.get('blog_name',
                                           DEFAULT_BLOG_NAME)
     blog = Blog(parent=blog_key(blog_name))
 
     if users.get_current_user():
-        blog.owner = users.get_current_user()
+      blog.owner = users.get_current_user()
+
 
     blog.title = self.request.get('title')
-    blog.url_title = ("_").join(blog.title.split())
 
-    logging.debug(blog.url_title)
+    ##ensure blog title does not already exist
+    check = len(Blog.query(Blog.title == blog.title).fetch())
+    print check
+    if ( check > 0):
+      errors.append("Blog already exists. Please choose a diffferent title.");
 
-    #store in DB
-    blog.put()
+      print errors
 
-    #redirect back to homepage
-    self.redirect('/home')
+      template = JINJA_ENVIRONMENT.get_template('new-blog.html')
+      template_values = {
+        'errors': errors,
+        'blog'  : blog
+      }
+      self.response.write(template.render(template_values))
+
+    else:
+      blog.url_title = ("_").join(blog.title.split())
+
+      #store in DB
+      blog.put()
+
+      #redirect back to homepage
+      self.redirect('/home')
   def get(self):
     self.redirect('/doesnotexist')
 
