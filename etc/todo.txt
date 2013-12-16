@@ -6,10 +6,14 @@ TODO:
   add extra field to keep it for title
   so title v url
 
---copy link for images
+-- tag display for blog
 
--- fix sort order
+-- limit to 10 tag search
 
---add id to post/blog urls
+-- upload image button
 
-10. Each blog will have an RSS link, that dumps an entire blog in XML format (see wiki page for example).
+--enforce image uniqu titles
+
+--copy image button
+
+--fix navbar links

@@ -2,15 +2,16 @@ $(function(){
 
   function limitPostView()
   {
+
     var total_posts = $('#post-list').data('posttotal');
     console.log(total_posts);
 
     var page_index = $('#post-list').data('pageindex');
 
-    //if pageindex -1 show all posts
-    if (page_index === -1){
-      console.log("limitPostView - show all");
-      $('.list-group-item').hide().toggle();
+    //if lte 10 total posts hide buttons
+    if (total_posts <= 10){
+      $('#post-page-prev').hide();
+      $('#post-page-next').hide();
     }
 
     //hide all posts
