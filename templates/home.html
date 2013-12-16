@@ -11,13 +11,20 @@
 
   <div class="container">
 
-    <h2>{{user}}</h2>
-    {% for blog in blogs %}
-        <h3><a href="/b/{{blog.url_title}}">{{blog.title}}</a></h3>
-    {% else %}
-      <h3>Doesn't look like you've made a blog yet</h3>
-    {% endfor %}
-    <a href="/b/new-blog">Create New Blog</a>
+    <div class="clearfix">
+      <h2 class="pull-left">{{user}}'s Blogs</h2>
+      <button class="btn btn-primary pull-right" href="/b/new-blog">Create New Blog</button>
+    </div>
+    <div >
+      {% for blog in blogs %}
+        <h2><a href="/b/{{blog.url_title}}">{{blog.title}}</a></h2>
+      {% else %}
+        <div class="alert alert-info alert-dismissable">
+          <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+          <strong>Hey!</strong> Welcome, doesn't look like you've made any blogs yet.
+        </div>
+      {% endfor %}
+    </div>
   </div>
 </body>
 </html>

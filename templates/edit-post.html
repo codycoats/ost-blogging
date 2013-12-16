@@ -14,6 +14,10 @@
       <h1>Edit Post <small>{{blog.title}} | {{post.title}}</small></h1>
     </header>
 
+    {% for error in errors %}
+      <div class="alert alert-danger"><strong>Error:</strong> {{error}}</div>
+    {%endfor%}
+
     <form action="/p/{{blog.url_title}}/{{post.url_title}}/update-post" method="post" role="form">
       <div class="form-group">
         <label for="title">Title</label>

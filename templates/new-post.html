@@ -13,16 +13,29 @@
     <header class="page-header">
       <h1>New Post <small> for {{blog.title}}</small></h1>
     </header>
+    {% for error in errors %}
+      <div class="alert alert-danger"><strong>Error:</strong> {{error}}</div>
+    {%endfor%}
 
     <form action="/p/{{blog.url_title}}/create-post" method="post" role="form">
       <div class="form-group">
-        <label for="title">Title</label>
-        <input type="text" name="title" class="form-control" placeholder="Post Title">
-        <label for="tags">Tags</label>
-        <input type="text" name="tags" placeholder="awesome tags go here" class="form-control" autocomplete="off"></input>
-        <br>
-        <label for="content">Content</label>
-        <textarea name="content" class="form-control" placeholder="Lorem impusm..."></textarea>
+        {%if post%}
+          <label for="title">Title</label>
+          <input type="text" name="title" class="form-control" placeholder="Post Title" value="{{post.title}}">
+          <label for="tags">Tags</label>
+          <input type="text" name="tags" placeholder="awesome tags go here" class="form-control" autocomplete="off" value="{{post.tags|join(" ")}}"></input>
+          <br>
+          <label for="content">Content</label>
+          <textarea name="content" class="form-control" placeholder="Lorem impusm...">{{post.orig_content}}</textarea>
+        {%else%}
+          <label for="title">Title</label>
+          <input type="text" name="title" class="form-control" placeholder="Post Title">
+          <label for="tags">Tags</label>
+          <input type="text" name="tags" placeholder="awesome tags go here" class="form-control" autocomplete="off"></input>
+          <br>
+          <label for="content">Content</label>
+          <textarea name="content" class="form-control" placeholder="Lorem impusm..."></textarea>
+        {%endif%}
       </div>
       <button type="submit" class="btn btn-success">Submit</button>
     </form>

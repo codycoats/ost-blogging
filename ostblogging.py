@@ -232,6 +232,8 @@ class NewPost(webapp2.RequestHandler):
 
 class CreatePost(webapp2.RequestHandler):
   def post(self, blog_url_title):
+    errors = []
+
     #create new Blog Model
     post_name = self.request.get('post_name',
                                           DEFAULT_POST_NAME)
@@ -242,6 +244,8 @@ class CreatePost(webapp2.RequestHandler):
     else:
       print "<h1> You must be logged in to create a post.</h1>"
       print "<a href='/home'>Okay :(</a>))"
+
+    title = self.request.get('title')
 
     #get tags
     tags_s = self.request.get('tags')
@@ -257,27 +261,42 @@ class CreatePost(webapp2.RequestHandler):
       short_content+="..."
 
     post.tags = tags_l
-    post.title = self.request.get('title')
+    post.title = title
     post.url_title = ("_").join(post.title.split())
     post.long_content = long_content
     post.short_content = short_content
     post.orig_content = orig_content
     post.blog = Blog.query(Blog.url_title == blog_url_title).get().title
 
-    #store in DB
-    post.put()
+    ##check if post with info already exists
+    p = Post.query(Post.title == post.title).get()
+    blog = Blog.query(Blog.title == post.blog).get()
 
-    #redirect back to homepage
-    self.redirect('/b/'+blog_url_title)
+    if (p and blog and p.blog ==blog.title):
+
+      errors.append("Post with that title already exists on your blog.")
+
+      template = JINJA_ENVIRONMENT.get_template('new-post.html')
+      template_values = {
+        'errors': errors,
+        'post'  : post,
+        'blog'  : blog
+      }
+      self.response.write(template.render(template_values))
+    else:
+      #store in DB
+      post.put()
+
+      #redirect back to homepage
+      self.redirect('/b/'+blog_url_title)
 
 class ShowPost(webapp2.RequestHandler):
   def get(self, blog_url_title, post_url_title):
     blog = Blog.query(blog_url_title == Blog.url_title).get()
     post = Post.query(blog.title == Post.blog, post_url_title == Post.url_title).get()
 
-    logging.debug("Post found is: "+str(post))
-
-    print(len(post.tags))
+    if not post :
+      print "Post not found"
 
     template_values = {
       'blog' : blog,
@@ -308,9 +327,13 @@ class EditPost(webapp2.RequestHandler):
 
 class UpdatePost(webapp2.RequestHandler):
   def post(self, blog_url_title, post_url_title):
+    errors = []
 
     blog = Blog.query(blog_url_title == Blog.url_title).get()
     post = Post.query(blog.title == Post.blog, post_url_title == Post.url_title).get()
+
+    print blog.title
+    print post.title
 
     if not (users.get_current_user() == post.author):
       print "<h1> You must be logged and be the owner of the post to update it.</h1>"
@@ -329,21 +352,41 @@ class UpdatePost(webapp2.RequestHandler):
     short_content = orig_content[:500]
 
     #get tags
-    tags_s = self.request.get('tags')
-    tags_l = helpers.parse_tags(tags_s)
+    tags = helpers.parse_tags(self.request.get('tags'))
 
-    post.tags = tags_l
+    post.tags = tags
     post.title = self.request.get('title')
     post.url_title = ("_").join(post.title.split())
     post.orig_content = orig_content
     post.long_content = long_content
     post.short_content = short_content
 
-    #store in DB
-    post.put()
+    print blog.title
+    print post.title
 
-    #redirect back to homepage
-    self.redirect('/p/'+blog_url_title+'/'+post.url_title)
+    check = Post.query(Post.title == post.title, Post.blog == blog.title).fetch()
+    print check
+
+    if (len(check) > 0):
+      print "post with that title already exists"
+      errors.append("Post with that title already exists on your blog.")
+
+      template = JINJA_ENVIRONMENT.get_template('edit-post.html')
+      template_values = {
+        'errors': errors,
+        'post'  : post,
+        'blog'  : blog
+      }
+      self.response.write(template.render(template_values))
+
+    else:
+      #store in DB
+      post.put()
+
+      #redirect back to homepage
+      self.redirect('/p/'+blog_url_title+'/'+post.url_title)
+
+
 
 class DeletePost(webapp2.RequestHandler):
   def get(self, blog_url_title, post_url_title):
@@ -441,14 +484,10 @@ class ShowImage(webapp2.RequestHandler):
   def get(self, image_title):
     image = Image.query(Image.url_title == image_title).fetch()[0]
 
-    print image.blob_key
-
     template_values = {
       'image' : image,
       'img_url' : images.get_serving_url(image.blob_key)
     }
-
-    print template_values['img_url']
 
     template = JINJA_ENVIRONMENT.get_template('image.html')
     self.response.write(template.render(template_values))
