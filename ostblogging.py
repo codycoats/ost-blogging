@@ -164,6 +164,20 @@ class ShowBlog(webapp2.RequestHandler):
     template = JINJA_ENVIRONMENT.get_template('blog.html')
     self.response.write(template.render(template_values))
 
+class RSSBlog(webapp2.RequestHandler):
+  def get(self, blog_url_title):
+    blog = Blog.query(Blog.url_title == blog_url_title).get()
+    posts = Post.query(Post.blog == blog.title).order(-Post.date_created).fetch()
+
+    template_values = {
+      'blog' : blog,
+      'posts' : posts
+    }
+
+    template = JINJA_ENVIRONMENT.get_template('rss.xml')
+    self.response.headers["Content-Type"] = 'application/rss+xml'
+    self.response.write(template.render(template_values))
+
 class does_not_exist(webapp2.RequestHandler):
   def get(self):
     print "<h1>That page doesn't exist</h1>"
@@ -294,8 +308,6 @@ class UpdatePost(webapp2.RequestHandler):
     #look for webpages & images
     long_content = helpers.parse_content(orig_content)
     short_content = orig_content[:500]
-
-    print (long_content == orig_content)
 
     #get tags
     tags_s = self.request.get('tags')
@@ -435,6 +447,7 @@ app = webapp2.WSGIApplication([
   #('r/b/(.*)/update-blog(.*), UpdateBlog'),
   #('r/b/(.*)/delete-blog(.*), DeleteBlog'),
   #('r/b/(.*)/destroy-blog(.*), DestroyBlog'),
+  (r'/b/(.*)/rss', RSSBlog),
   (r'/b/(.*)', ShowBlog),
   (r'/p/(.*)/new-post', NewPost),
   (r'/p/(.*)/create-post', CreatePost),

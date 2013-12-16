@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+
+  <channel>
+    <title>{{blog.title}}</title>
+    <link>http://ostblogging.appsot.com/b/{{blog.url_title}}</link>
+    <description>A blog created on OSTBlogging</description>
+    {%for post in posts%}
+    <item>
+      <title>post.title</title>
+      <link>http://ostblogging.appspot.com/b/{{blog.url_title}}/{{post.url_title}}/show-post</link>
+      <guid>http://ostblogging.appspot.com/b/{{blog.url_title}}/{{post.url_title}}/show-post</guid>
+    </item>
+    {%endfor%}
+  </channel>
+</rss>

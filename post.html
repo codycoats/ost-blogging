@@ -6,6 +6,7 @@
   <link rel="stylesheet" href="/css/styles.css">
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
   <script src="/js/bootstrap.min.js"></script>
+  <script src="/js/post.js"></script>
 </head>
 <body>
   <nav class="navbar navbar-inverse navbar-static-top" role="navigation">
@@ -70,7 +71,9 @@
           </ul>
       </section>
       <section class="panel-body">
-        <pre>{{post.long_content|safe}}</pre>
+        <pre>
+          {{post.long_content|safe}}
+        </pre>
       </section>
     {%endif%}
     </article>

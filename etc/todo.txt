@@ -1,23 +1,15 @@
 TODO:
 
---Anonymous redirect for user && blog
-  i.e. create /u/* && /b/**
 
 --dont allow blogs/posts to have spaces
   strip spaces when saving the id
   add extra field to keep it for title
   so title v url
 
+--copy link for images
 
 -- fix sort order
 
 --add id to post/blog urls
-
-
-2. A user can select a blog that they own and write a post to that blog. A post consists of a title and a body, which will be entered via a CGI form.
-
-8. Whenpostscontainlinks(textthatbeginswith http:// or https://),they will be displayed as HTML links when viewed. If a link ends with .jpg, .png, or .gif, it will be displayed inline rather than as a link.
-
-9. Images can be uploaded. These will be available via a permalink after uploaded, and can be referenced using links in the posts.
 
 10. Each blog will have an RSS link, that dumps an entire blog in XML format (see wiki page for example).
