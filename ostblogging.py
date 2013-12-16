@@ -24,7 +24,9 @@ import os, cgi, logging, webapp2, jinja2, math
 import helpers
 
 JINJA_ENVIRONMENT = jinja2.Environment(
-    loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
+    loader=jinja2.FileSystemLoader(
+        [os.path.join(os.path.dirname(__file__),"templates/includes"),
+         os.path.join(os.path.dirname(__file__),"templates")]),
     extensions=['jinja2.ext.autoescape'],
     autoescape=True)
 JINJA_ENVIRONMENT.filters['pretty_date'] = helpers.pretty_date
