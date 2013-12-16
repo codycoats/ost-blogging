@@ -16,17 +16,24 @@
 #
 from google.appengine.api import users
 from google.appengine.ext import ndb
+from google.appengine.ext import blobstore
+from google.appengine.ext.webapp import blobstore_handlers
+from google.appengine.api import images
 
 import os, cgi, logging, webapp2, jinja2, math
-from helpers import parse_tags
+import helpers
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
     extensions=['jinja2.ext.autoescape'],
     autoescape=True)
-
+JINJA_ENVIRONMENT.filters['pretty_date'] = helpers.pretty_date
 
 DEFAULT_BLOG_NAME = 'default_blog'
+DEFAULT_IMAGE_NAME = 'default_image'
+DEFAULT_POST_NAME = 'default_post'
+
+
 
 
 class MainHandler(webapp2.RequestHandler):
@@ -78,6 +85,11 @@ class UserHome(webapp2.RequestHandler):
 
     else:
       self.redirect('/')
+
+class Blog(ndb.Model):
+  owner = ndb.UserProperty()
+  title = ndb.StringProperty()
+  url_title = ndb.StringProperty()
 
 def blog_key(blog_name=DEFAULT_BLOG_NAME):
     """Constructs a Datastore key for a Blog entity with blog_name."""
@@ -157,63 +169,6 @@ class does_not_exist(webapp2.RequestHandler):
     print "<h1>That page doesn't exist</h1>"
     print "<h2>Sorry :(</h2>"
 
-def pretty_date(time=False):
-    """
-    Get a datetime object or a int() Epoch timestamp and return a
-    pretty string like 'an hour ago', 'Yesterday', '3 months ago',
-    'just now', etc
-    """
-    from datetime import datetime
-    now = datetime.now()
-    if type(time) is int:
-        diff = now - datetime.fromtimestamp(time)
-    elif isinstance(time,datetime):
-        diff = now - time
-    elif not time:
-        diff = now - now
-    second_diff = diff.seconds
-    day_diff = diff.days
-
-    if day_diff < 0:
-        return ''
-
-    if day_diff == 0:
-        if second_diff < 10:
-            return "just now"
-        if second_diff < 60:
-            return str(second_diff) + " seconds ago"
-        if second_diff < 120:
-            return  "a minute ago"
-        if second_diff < 3600:
-            return str( second_diff / 60 ) + " minutes ago"
-        if second_diff < 7200:
-            return "an hour ago"
-        if second_diff < 86400:
-            return str( second_diff / 3600 ) + " hours ago"
-    if day_diff == 1:
-        return "Yesterday"
-    if day_diff < 7:
-        return str(day_diff) + " days ago"
-    if day_diff < 31:
-        return str(day_diff/7) + " weeks ago"
-    if day_diff < 365:
-        return str(day_diff/30) + " months ago"
-    return str(day_diff/365) + " years ago"
-
-
-def format_number(number):
-    s = '%d' % number
-    groups = []
-    while s and s[-1].isdigit():
-        groups.append(s[-3:])
-        s = s[:-3]
-    return s + ','.join(reversed(groups))
-
-JINJA_ENVIRONMENT.filters['pretty_date'] = pretty_date
-
-
-DEFAULT_POST_NAME = 'default_post'
-
 class Post(ndb.Model):
   author = ndb.UserProperty()
   blog = ndb.StringProperty()
@@ -221,6 +176,7 @@ class Post(ndb.Model):
   url_title = ndb.StringProperty()
   short_content = ndb.TextProperty()
   long_content = ndb.TextProperty()
+  orig_content = ndb.TextProperty()
   date_created = ndb.DateTimeProperty(auto_now_add=True)
   date_last_modified = ndb.DateTimeProperty(auto_now=True)
   tags = ndb.StringProperty(repeated=True)
@@ -256,19 +212,23 @@ class CreatePost(webapp2.RequestHandler):
 
     #get tags
     tags_s = self.request.get('tags')
-    tags_l = parse_tags(tags_s)
+    tags_l = helpers.parse_tags(tags_s)
 
-    content = self.request.get('content')
-    short_content = content[:500]
+    orig_content = self.request.get('content')
 
-    if content != short_content:
+    #look for webpages & images
+    long_content = helpers.parse_content(orig_content)
+    short_content = orig_content[:500]
+
+    if long_content != short_content:
       short_content+="..."
 
     post.tags = tags_l
     post.title = self.request.get('title')
     post.url_title = ("_").join(post.title.split())
-    post.long_content = content
+    post.long_content = long_content
     post.short_content = short_content
+    post.orig_content = orig_content
     post.blog = Blog.query(Blog.url_title == blog_url_title).get().title
 
     #store in DB
@@ -329,14 +289,23 @@ class UpdatePost(webapp2.RequestHandler):
     if content != short_content:
       short_content+="..."
 
+    orig_content = self.request.get('content')
+
+    #look for webpages & images
+    long_content = helpers.parse_content(orig_content)
+    short_content = orig_content[:500]
+
+    print (long_content == orig_content)
+
     #get tags
     tags_s = self.request.get('tags')
-    tags_l = parse_tags(tags_s)
+    tags_l = helpers.parse_tags(tags_s)
 
     post.tags = tags_l
     post.title = self.request.get('title')
     post.url_title = ("_").join(post.title.split())
-    post.long_content = content
+    post.orig_content = orig_content
+    post.long_content = long_content
     post.short_content = short_content
 
     #store in DB
@@ -389,29 +358,95 @@ class SearchTag(webapp2.RequestHandler):
     template = JINJA_ENVIRONMENT.get_template('tag.html')
     self.response.write(template.render(template_values))
 
-class Blog(ndb.Model):
-  owner = ndb.UserProperty()
+class Image(ndb.Model):
   title = ndb.StringProperty()
   url_title = ndb.StringProperty()
+  blob_key = ndb.BlobKeyProperty()
+  owner = ndb.UserProperty()
+  date_uploaded = ndb.DateTimeProperty(auto_now_add=True)
+  caption = ndb.StringProperty()
+
+def image_key(image_name=DEFAULT_IMAGE_NAME):
+    """Constructs a Datastore key for a Image entity with image_name."""
+    return ndb.Key('Image', image_name)
+
+class NewImage(webapp2.RequestHandler):
+  def get(self):
+    image_upload_url = blobstore.create_upload_url('/upload-image')
+
+    template_values = {
+      'upload_url' : image_upload_url
+    }
+
+    template = JINJA_ENVIRONMENT.get_template('upload-image.html')
+    self.response.write(template.render(template_values))
+
+class UploadImage(blobstore_handlers.BlobstoreUploadHandler):
+  def post(self):
+    #create new Blog Model
+    image_name = self.request.get('image_name',
+                                          DEFAULT_IMAGE_NAME)
+    image = Image(parent=image_key(image_name))
+
+    if users.get_current_user():
+        image.owner = users.get_current_user()
+    else:
+      print "<h1> You must be logged in to upload an image.</h1>"
+      print "<a href='/home'>Okay :(</a>))"
+
+    uploadedFiles = self.get_uploads()
+    blobInfo = uploadedFiles[0]
+    image.blob_key = blobInfo.key()
+    image.title = self.request.get('title')
+    image.url_title = ("_").join(image.title.split())
+
+    #store in DB
+    image.put()
+
+    #redirect back to homepage
+    self.redirect('/i/'+image.url_title)
+
+class ShowImage(webapp2.RequestHandler):
+  def get(self, image_title):
+    image = Image.query(Image.url_title == image_title).fetch()[0]
+
+    print image.blob_key
+
+    template_values = {
+      'image' : image,
+      'img_url' : images.get_serving_url(image.blob_key)
+    }
+
+    print template_values['img_url']
+
+    template = JINJA_ENVIRONMENT.get_template('image.html')
+    self.response.write(template.render(template_values))
+
+
+# class ShowImage(webapp2.RequestHandler):
+#   def get(self,imageid):
 
 app = webapp2.WSGIApplication([
-    ('/', MainHandler),
-    ('/home', UserHome),
-    ('/b/new-blog', NewBlog),
-    ('/b/create-blog', CreateBlog),
-    #(r'/b/(.*)/edit-blog', EditBlog),
-    #('r/b/(.*)/update-blog(.*), UpdateBlog'),
-    #('r/b/(.*)/delete-blog(.*), DeleteBlog'),
-    #('r/b/(.*)/destroy-blog(.*), DestroyBlog'),
-    (r'/b/(.*)', ShowBlog),
-    (r'/p/(.*)/new-post', NewPost),
-    (r'/p/(.*)/create-post', CreatePost),
-    (r'/p/(.*)/(.*)/edit-post', EditPost),
-    (r'/p/(.*)/(.*)/update-post', UpdatePost),
-    (r'/p/(.*)/(.*)/delete-post', DeletePost),
-    (r'/p/(.*)/(.*)/destroy-post', DestroyPost),
-    (r'/p/(.*)/(.*)', ShowPost),
-    (r'/t/?(.*)', SearchTag),
-    (r'/t/(.*)', SearchTag),
-    (r'/(.*)', does_not_exist)
+  ('/', MainHandler),
+  ('/home', UserHome),
+  ('/b/new-blog', NewBlog),
+  ('/b/create-blog', CreateBlog),
+  #(r'/b/(.*)/edit-blog', EditBlog),
+  #('r/b/(.*)/update-blog(.*), UpdateBlog'),
+  #('r/b/(.*)/delete-blog(.*), DeleteBlog'),
+  #('r/b/(.*)/destroy-blog(.*), DestroyBlog'),
+  (r'/b/(.*)', ShowBlog),
+  (r'/p/(.*)/new-post', NewPost),
+  (r'/p/(.*)/create-post', CreatePost),
+  (r'/p/(.*)/(.*)/edit-post', EditPost),
+  (r'/p/(.*)/(.*)/update-post', UpdatePost),
+  (r'/p/(.*)/(.*)/delete-post', DeletePost),
+  (r'/p/(.*)/(.*)/destroy-post', DestroyPost),
+  (r'/p/(.*)/(.*)', ShowPost),
+  (r'/t/?(.*)', SearchTag),
+  (r'/t/(.*)', SearchTag),
+  ('/i/new-image', NewImage),
+  ('/upload-image', UploadImage),
+  (r'/i/(.*)', ShowImage),
+  (r'/(.*)', does_not_exist)
 ], debug=True)
