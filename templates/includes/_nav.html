@@ -6,10 +6,6 @@
 
   <!-- Collect the nav links, forms, and other content for toggling -->
   <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-    <ul class="nav navbar-nav">
-      <li class="active"><a href="#">Recent Posts</a></li>
-      <li><a href="#">Recent Images</a></li>
-    </ul>
     <form class="navbar-form navbar-left" role="search" action="/t/" method="get">
       <div class="form-group">
         <input type="text" class="form-control" placeholder="Search" name="tag">
@@ -22,10 +18,10 @@
         <a href="#" id="account-dropdown" role="button" class="dropdown-toggle" data-toggle="dropdown" >Account&nbsp;<b class="caret"></b>
         </a>
         <ul class="dropdown-menu" role="menu" aria-labelledby="account-dropdown">
-          <li role="presentation"><a href="#">Action</a></li>
+<!--           <li role="presentation"><a href="#">Action</a></li>
           <li role="presentation"><a href="#">Another action</a></li>
           <li role="presentation"><a href="#">Something else here</a></li>
-          <li class="divider"></li>
+          <li class="divider"></li> -->
           <li role="presentation"><a href="{{ inorout_url|safe }}">{{ inorout_text }}</a></li>
         </ul>
       </li>

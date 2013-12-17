@@ -611,9 +611,6 @@ class ShowImage(webapp2.RequestHandler):
     template = JINJA_ENVIRONMENT.get_template('image.html')
     self.response.write(template.render(template_values))
 
-# class ShowImage(webapp2.RequestHandler):
-#   def get(self,imageid):
-
 app = webapp2.WSGIApplication([
   ('/', MainHandler),
   ('/home', UserHome),
