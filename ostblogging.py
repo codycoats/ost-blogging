@@ -56,16 +56,19 @@ class UserHome(webapp2.RequestHandler):
 
       logging.debug("%s's blogs: %s", user, user_blogs)
 
-      url = users.create_logout_url(self.request.uri)
-      url_linktext = 'Logout'
-
-
       template_values = {
         'user'    : user,
         'blogs'   : user_blogs,
-        'url'     : url,
-        'url_linktext': url_linktext
       }
+
+      if users.get_current_user():
+        logout_url = users.create_logout_url(self.request.uri)
+        template_values['inorout_url'] = logout_url
+        template_values['inorout_text'] = 'Logout'
+      else:
+        login_url = users.create_login_url(self.request.uri)
+        template_values['inorout_url'] = login_url
+        template_values['inorout_text'] = 'Login'
 
       template = JINJA_ENVIRONMENT.get_template('home.html')
       self.response.write(template.render(template_values))
@@ -84,12 +87,21 @@ def blog_key(blog_name=DEFAULT_BLOG_NAME):
 
 class NewBlog(webapp2.RequestHandler):
   def get(self):
+    template_values = {}
+
     if users.get_current_user():
+      logout_url = users.create_logout_url(self.request.uri)
+      template_values['inorout_url'] = logout_url
+      template_values['inorout_text'] = 'Logout'
+
       template = JINJA_ENVIRONMENT.get_template('new-blog.html')
-      self.response.write(template.render())
+      self.response.write(template.render(template_values))
     else:
+      login_url = users.create_login_url(self.request.uri)
+      template_values['inorout_url'] = login_url
+      template_values['inorout_text'] = 'Login'
+
       template = JINJA_ENVIRONMENT.get_template('must-login.html')
-      template_values = { 'reason': 'Create a New Blog'}
       self.response.write(template.render(template_values))
 
 class CreateBlog(webapp2.RequestHandler):
@@ -121,6 +133,16 @@ class CreateBlog(webapp2.RequestHandler):
         'errors': errors,
         'blog'  : blog
       }
+
+      if users.get_current_user():
+        logout_url = users.create_logout_url(self.request.uri)
+        template_values['inorout_url'] = logout_url
+        template_values['inorout_text'] = 'Logout'
+      else:
+        login_url = users.create_login_url(self.request.uri)
+        template_values['inorout_url'] = login_url
+        template_values['inorout_text'] = 'Login'
+
       self.response.write(template.render(template_values))
 
     else:
@@ -169,11 +191,30 @@ class ShowBlog(webapp2.RequestHandler):
       else:
         template_values['user'] = 'visitor'
 
+      if users.get_current_user():
+        logout_url = users.create_logout_url(self.request.uri)
+        template_values['inorout_url'] = logout_url
+        template_values['inorout_text'] = 'Logout'
+      else:
+        login_url = users.create_login_url(self.request.uri)
+        template_values['inorout_url'] = login_url
+        template_values['inorout_text'] = 'Login'
+
     else:
       logging.debug("Blog not found");
+
       template_values = {
           'found': False
       }
+
+      if users.get_current_user():
+        logout_url = users.create_logout_url(self.request.uri)
+        template_values['inorout_url'] = logout_url
+        template_values['inorout_text'] = 'Logout'
+      else:
+        login_url = users.create_login_url(self.request.uri)
+        template_values['inorout_url'] = login_url
+        template_values['inorout_text'] = 'Login'
 
     template = JINJA_ENVIRONMENT.get_template('blog.html')
     self.response.write(template.render(template_values))
@@ -221,6 +262,15 @@ class NewPost(webapp2.RequestHandler):
     template_values = {
       'blog' : blog
     }
+
+    if users.get_current_user():
+        logout_url = users.create_logout_url(self.request.uri)
+        template_values['inorout_url'] = logout_url
+        template_values['inorout_text'] = 'Logout'
+    else:
+      login_url = users.create_login_url(self.request.uri)
+      template_values['inorout_url'] = login_url
+      template_values['inorout_text'] = 'Login'
 
     template = JINJA_ENVIRONMENT.get_template('new-post.html')
     self.response.write(template.render(template_values))
@@ -277,6 +327,16 @@ class CreatePost(webapp2.RequestHandler):
         'post'  : post,
         'blog'  : blog
       }
+
+      if users.get_current_user():
+        logout_url = users.create_logout_url(self.request.uri)
+        template_values['inorout_url'] = logout_url
+        template_values['inorout_text'] = 'Logout'
+      else:
+        login_url = users.create_login_url(self.request.uri)
+        template_values['inorout_url'] = login_url
+        template_values['inorout_text'] = 'Login'
+
       self.response.write(template.render(template_values))
     else:
       #store in DB
@@ -298,6 +358,15 @@ class ShowPost(webapp2.RequestHandler):
       'post' : post,
     }
 
+    if users.get_current_user():
+        logout_url = users.create_logout_url(self.request.uri)
+        template_values['inorout_url'] = logout_url
+        template_values['inorout_text'] = 'Logout'
+    else:
+      login_url = users.create_login_url(self.request.uri)
+      template_values['inorout_url'] = login_url
+      template_values['inorout_text'] = 'Login'
+
     template = JINJA_ENVIRONMENT.get_template('post.html')
     self.response.write(template.render(template_values))
 
@@ -316,6 +385,15 @@ class EditPost(webapp2.RequestHandler):
       'blog' : blog,
       'post' : post
     }
+
+    if users.get_current_user():
+        logout_url = users.create_logout_url(self.request.uri)
+        template_values['inorout_url'] = logout_url
+        template_values['inorout_text'] = 'Logout'
+    else:
+      login_url = users.create_login_url(self.request.uri)
+      template_values['inorout_url'] = login_url
+      template_values['inorout_text'] = 'Login'
 
     template = JINJA_ENVIRONMENT.get_template('edit-post.html')
     self.response.write(template.render(template_values))
@@ -369,6 +447,16 @@ class UpdatePost(webapp2.RequestHandler):
         'post'  : post,
         'blog'  : blog
       }
+
+      if users.get_current_user():
+        logout_url = users.create_logout_url(self.request.uri)
+        template_values['inorout_url'] = logout_url
+        template_values['inorout_text'] = 'Logout'
+      else:
+        login_url = users.create_login_url(self.request.uri)
+        template_values['inorout_url'] = login_url
+        template_values['inorout_text'] = 'Login'
+
       self.response.write(template.render(template_values))
 
     else:
@@ -389,6 +477,15 @@ class DeletePost(webapp2.RequestHandler):
       'blog' : blog,
       'post' : post
     }
+
+    if users.get_current_user():
+        logout_url = users.create_logout_url(self.request.uri)
+        template_values['inorout_url'] = logout_url
+        template_values['inorout_text'] = 'Logout'
+    else:
+      login_url = users.create_login_url(self.request.uri)
+      template_values['inorout_url'] = login_url
+      template_values['inorout_text'] = 'Login'
 
     template = JINJA_ENVIRONMENT.get_template('delete-post.html')
     self.response.write(template.render(template_values))
@@ -421,6 +518,16 @@ class SearchTag(webapp2.RequestHandler):
       'posts' : posts
     }
 
+    if users.get_current_user():
+        logout_url = users.create_logout_url(self.request.uri)
+        template_values['inorout_url'] = logout_url
+        template_values['inorout_text'] = 'Logout'
+    else:
+      login_url = users.create_login_url(self.request.uri)
+      template_values['inorout_url'] = login_url
+      template_values['inorout_text'] = 'Login'
+
+
     template = JINJA_ENVIRONMENT.get_template('tag.html')
     self.response.write(template.render(template_values))
 
@@ -442,6 +549,15 @@ class NewImage(webapp2.RequestHandler):
     template_values = {
       'upload_url' : image_upload_url
     }
+
+    if users.get_current_user():
+        logout_url = users.create_logout_url(self.request.uri)
+        template_values['inorout_url'] = logout_url
+        template_values['inorout_text'] = 'Logout'
+    else:
+      login_url = users.create_login_url(self.request.uri)
+      template_values['inorout_url'] = login_url
+      template_values['inorout_text'] = 'Login'
 
     template = JINJA_ENVIRONMENT.get_template('upload-image.html')
     self.response.write(template.render(template_values))
@@ -483,9 +599,17 @@ class ShowImage(webapp2.RequestHandler):
       'img_url' : images.get_serving_url(image.blob_key)
     }
 
+    if users.get_current_user():
+        logout_url = users.create_logout_url(self.request.uri)
+        template_values['inorout_url'] = logout_url
+        template_values['inorout_text'] = 'Logout'
+    else:
+      login_url = users.create_login_url(self.request.uri)
+      template_values['inorout_url'] = login_url
+      template_values['inorout_text'] = 'Login'
+
     template = JINJA_ENVIRONMENT.get_template('image.html')
     self.response.write(template.render(template_values))
-
 
 # class ShowImage(webapp2.RequestHandler):
 #   def get(self,imageid):

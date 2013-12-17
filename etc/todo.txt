@@ -1,15 +1,3 @@
 TODO:
 
-
---dont allow blogs/posts to have spaces
-  strip spaces when saving the id
-  add extra field to keep it for title
-  so title v url
-
--- upload image button
-
---enforce image uniqu titles
-
---copy image button
-
 --fix navbar links
