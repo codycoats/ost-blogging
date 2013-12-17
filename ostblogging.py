@@ -164,7 +164,7 @@ class ShowBlog(webapp2.RequestHandler):
     ##If blog doesn't exist redirect
     if (blog):
       #get all posts of blog
-      posts = Post.query(Post.blog == blog.title).order(-Post.date_created).fetch()
+      posts = Post.query(Post.blog == blog.url_title).order(-Post.date_created).fetch()
 
       num_pages = int(math.ceil(len(posts)/10.0))
       print num_pages
@@ -222,7 +222,7 @@ class ShowBlog(webapp2.RequestHandler):
 class RSSBlog(webapp2.RequestHandler):
   def get(self, blog_url_title):
     blog = Blog.query(Blog.url_title == blog_url_title).get()
-    posts = Post.query(Post.blog == blog.title).order(-Post.date_created).fetch()
+    posts = Post.query(Post.blog == blog.url_title).order(-Post.date_created).fetch()
 
     template_values = {
       'blog' : blog,
@@ -311,13 +311,13 @@ class CreatePost(webapp2.RequestHandler):
     post.long_content = long_content
     post.short_content = short_content
     post.orig_content = orig_content
-    post.blog = Blog.query(Blog.url_title == blog_url_title).get().title
+    post.blog = Blog.query(Blog.url_title == blog_url_title).get().url_title
 
     ##check if post with info already exists
     p = Post.query(Post.title == post.title).get()
-    blog = Blog.query(Blog.title == post.blog).get()
+    blog = Blog.query(Blog.url_title == post.blog).get()
 
-    if (p and blog and p.blog ==blog.title):
+    if (p and blog and p.blog ==blog.url_title):
 
       errors.append("Post with that title already exists on your blog.")
 
@@ -348,7 +348,7 @@ class CreatePost(webapp2.RequestHandler):
 class ShowPost(webapp2.RequestHandler):
   def get(self, blog_url_title, post_url_title):
     blog = Blog.query(blog_url_title == Blog.url_title).get()
-    post = Post.query(blog.title == Post.blog, post_url_title == Post.url_title).get()
+    post = Post.query(blog.url_title == Post.blog, post_url_title == Post.url_title).get()
 
     if not post :
       print "Post not found"
@@ -377,7 +377,7 @@ class EditPost(webapp2.RequestHandler):
     print(post_url_title)
 
     blog = Blog.query(blog_url_title == Blog.url_title).get()
-    post = Post.query(blog.title == Post.blog, post_url_title == Post.url_title).get()
+    post = Post.query(blog.url_title == Post.blog, post_url_title == Post.url_title).get()
 
     print(post.url_title == post_url_title)
 
@@ -403,7 +403,7 @@ class UpdatePost(webapp2.RequestHandler):
     errors = []
 
     blog = Blog.query(blog_url_title == Blog.url_title).get()
-    post = Post.query(blog.title == Post.blog, post_url_title == Post.url_title).get()
+    post = Post.query(blog.url_title == Post.blog, post_url_title == Post.url_title).get()
 
     if not (users.get_current_user() == post.author):
       print "<h1> You must be logged and be the owner of the post to update it.</h1>"
@@ -431,10 +431,7 @@ class UpdatePost(webapp2.RequestHandler):
     post.long_content = long_content
     post.short_content = short_content
 
-    print blog.title
-    print post.title
-
-    check = Post.query(Post.title == post.title, Post.blog == blog.title).fetch()
+    check = Post.query(Post.title == post.title, Post.blog == blog.url_title).fetch()
     print check
 
     if (len(check) > 0 and post.url_title != post_url_title):
@@ -471,7 +468,7 @@ class UpdatePost(webapp2.RequestHandler):
 class DeletePost(webapp2.RequestHandler):
   def get(self, blog_url_title, post_url_title):
     blog = Blog.query(blog_url_title == Blog.url_title).get()
-    post = Post.query(blog.title == Post.blog, post_url_title == Post.url_title).get()
+    post = Post.query(blog.url_title == Post.blog, post_url_title == Post.url_title).get()
 
     template_values = {
       'blog' : blog,
@@ -494,7 +491,7 @@ class DestroyPost(webapp2.RequestHandler):
   def post(self, blog_url_title, post_url_title):
 
     blog = Blog.query(blog_url_title == Blog.url_title).get()
-    post = Post.query(blog.title == Post.blog, post_url_title == Post.url_title).get()
+    post = Post.query(blog.url_title == Post.blog, post_url_title == Post.url_title).get()
 
     if not (users.get_current_user() == post.author):
       print "<h1> You must be logged and be the owner of the post to delete it.</h1>"
