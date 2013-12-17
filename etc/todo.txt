@@ -6,10 +6,6 @@ TODO:
   add extra field to keep it for title
   so title v url
 
--- tag display for blog
-
--- limit to 10 tag search
-
 -- upload image button
 
 --enforce image uniqu titles

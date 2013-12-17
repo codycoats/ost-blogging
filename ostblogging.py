@@ -147,12 +147,20 @@ class ShowBlog(webapp2.RequestHandler):
       num_pages = int(math.ceil(len(posts)/10.0))
       print num_pages
 
+      #get all tags from all posts
+      tags = []
+      for post in posts:
+        tags.append(post.tags)
+      tags = list(set([y for x in tags for y in x]))
+      print tags
+
       #render template
       template_values = {
         'found'   : True,
         'blog'    : blog,
         'posts'   : posts,
-        'num_pages' : num_pages
+        'num_pages' : num_pages,
+        'tags' : tags
       }
 
       ##check if owner is viewing
@@ -319,9 +327,6 @@ class UpdatePost(webapp2.RequestHandler):
     blog = Blog.query(blog_url_title == Blog.url_title).get()
     post = Post.query(blog.title == Post.blog, post_url_title == Post.url_title).get()
 
-    print blog.title
-    print post.title
-
     if not (users.get_current_user() == post.author):
       print "<h1> You must be logged and be the owner of the post to update it.</h1>"
       print "<a href='/home'>Okay :(</a>))"
@@ -354,7 +359,7 @@ class UpdatePost(webapp2.RequestHandler):
     check = Post.query(Post.title == post.title, Post.blog == blog.title).fetch()
     print check
 
-    if (len(check) > 0):
+    if (len(check) > 0 and post.url_title != post_url_title):
       print "post with that title already exists"
       errors.append("Post with that title already exists on your blog.")
 
@@ -459,17 +464,20 @@ class UploadImage(blobstore_handlers.BlobstoreUploadHandler):
     blobInfo = uploadedFiles[0]
     image.blob_key = blobInfo.key()
     image.title = self.request.get('title')
-    image.url_title = ("_").join(image.title.split())
 
     #store in DB
     image.put()
 
+    print image.key.urlsafe()
+
     #redirect back to homepage
-    self.redirect('/i/'+image.url_title)
+    self.redirect('/i/'+image.key.urlsafe())
 
 class ShowImage(webapp2.RequestHandler):
-  def get(self, image_title):
-    image = Image.query(Image.url_title == image_title).fetch()[0]
+  def get(self, url_key):
+    image_key = ndb.Key(urlsafe=url_key)
+
+    image = image_key.get()
 
     template_values = {
       'image' : image,

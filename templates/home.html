@@ -13,7 +13,10 @@
 
     <div class="clearfix">
       <h2 class="pull-left">{{user}}'s Blogs</h2>
-      <button class="btn btn-primary pull-right" href="/b/new-blog">Create New Blog</button>
+      <div class="pull-right">
+        <a class="btn btn-primary" href="/b/new-blog">Create New Blog</a>
+        <a class="btn btn-primary" href="/i/new-image">Upload an Image</a>
+      </div>
     </div>
     <div >
       {% for blog in blogs %}

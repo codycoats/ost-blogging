@@ -3,6 +3,7 @@
 <html>
   <head>
     <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/styles.css">
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
     <script src="/js/blog.js"></script>
@@ -17,9 +18,17 @@
     {% else %}
     <div class="page-header">
       <h1 class="text-center">{{blog.title}} <small>by {{blog.owner}}</small></h1>
-      <a href="/b/{{blog.url_title}}/rss" class="pull-right"><img src="/images/valid-rss-rogers.png" alt=""></a>
+
     </div>
     <div class="panel panel-default">
+      <div class="panel panel-body">
+        <div id="tags">
+          {% for t in tags %}
+            <a href="/t/{{t}}" class="badge">{{t}}</a>
+          {%endfor%}
+        </div>
+        <a href="/b/{{blog.url_title}}/rss" class="pull-right"><img src="/images/valid-rss-rogers.png" alt=""></a>
+      </div>
       <ul id="post-list" class="list-group" data-posttotal="{{posts|length}}" data-pageindex="0">
       {% for post in posts %}
           <li class="list-group-item" data-postindex="{{loop.index}}">
