@@ -430,7 +430,6 @@ class Image(ndb.Model):
   blob_key = ndb.BlobKeyProperty()
   owner = ndb.UserProperty()
   date_uploaded = ndb.DateTimeProperty(auto_now_add=True)
-  caption = ndb.StringProperty()
 
 def image_key(image_name=DEFAULT_IMAGE_NAME):
     """Constructs a Datastore key for a Image entity with image_name."""

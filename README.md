@@ -110,10 +110,9 @@ Requirements -------------------------------------------------------------------
 
    Images are uploaded using the /i/new-image link. The images are saved in the
    blobstore.
-   One can view the image using /i/{image-title} url. To reference a posted link
-   you must copy the url of the actual image. One cannot use /i/{image-title} as
-   that is a link to view the image. There is a copy image button to do this when
-   viewing an image.
+   To reference in a posted link you must copy the url of the actual image (right click "copy image address").
+   This url is listed below the image on the view image page.
+   One cannot use /i/{image-title} as that is a link to view the image page not the image.
 
 10. Each blog will have an RSS link, that dumps an entire blog in XML format.
 

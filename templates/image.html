@@ -19,11 +19,11 @@
         {% if not image%}
           <h1 class="">Post not found :(</h1>
         {%else%}
-          <small class="">Uploaded - {{image.date_uploaded|pretty_date}}</small><br>
           <figure>
             <img src="{{img_url}}" alt="">
-            <figcaption>{{image.caption}}</figcaption>
           </figure>
+          <h2>Image URL: {{img_url}}</h2>
+          <small class="">Uploaded - {{image.date_uploaded|pretty_date}}</small>
       </section>
     {%endif%}
     </article>
